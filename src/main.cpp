@@ -1,7 +1,6 @@
 #include "esp_wpa2.h"
 #include <WiFi.h>
 #include <Arduino.h>
-#include <ESPAsyncWebServer.h>
 
 // WiFi network name and password:
 const char* SSID = "eduroam"; // your ssid
