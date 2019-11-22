@@ -2,13 +2,13 @@
 #include <Arduino.h>
 
 #define BAUD 9600
-#define NEDUROAM 
+#define WIFI_CONNECT 
 
 void setup() {
 
   Serial.begin(BAUD);
 
-  #ifdef NEDUROAM
+  #ifdef WIFI_CONNECT
     
     const char* ssid = "Nuno Guterres";
     const char* pass = "nuno1234";
@@ -25,6 +25,10 @@ void setup() {
     Serial.println(WiFi.localIP());
 
   #endif
+  #ifndef WIFI_CONNECT
+    Serial.println("Please enable Wifi Connection!");
+  #endif
+
  
 }
 
