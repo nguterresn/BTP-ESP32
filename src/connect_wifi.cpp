@@ -1,14 +1,6 @@
 #include "connect_wifi.h"
 
-boolean ConnectWifi() {
-
-    IPAddress ip(172, 20, 10, 1); //28
-    IPAddress gateway(172, 20, 10, 14);
-    IPAddress subnet(255, 255, 255, 240);
-    //WiFiServer server(80);
-
-    const char* ssid = "Nuno Guterres";
-    const char* pass = "nuno1234";
+boolean ConnectWifi(const char* ssid, const char* pass) {
 
     uint32_t time_conter = 0;
 
@@ -24,17 +16,17 @@ boolean ConnectWifi() {
       Serial.println("Establishing connection to WiFi...");
     }
     
-    WiFi.config(ip, gateway, subnet);
-    Serial.println("Connected to network");
+    Serial.print("Connected to network: ");
+    Serial.print(WiFi.localIP());
+    Serial.print(" | ");
     Serial.println(WiFi.macAddress());
-    Serial.println(WiFi.localIP());
 
     return true;
 }
 
 boolean CheckNetwork(const char *addr) {
 
-    bool success = Ping.ping(addr, 1); // broadcast
+    bool success = Ping.ping(addr, 3); 
  
     if(!success){
         Serial.println("Ping failed");
@@ -49,8 +41,38 @@ boolean SetNetwork(IPAddress ip, IPAddress gateway, IPAddress subnet) {
 
     bool result = WiFi.config(ip, gateway, subnet);
 
-    if (!result)
+    if (!result) {
+      Serial.println("Node was not set correctly.");
       return false;
-  
+    }
+
+    Serial.print("Node is well set: ");
+    Serial.println(WiFi.localIP());
     return true;
+}
+
+boolean Node_Election(IPAddress gateway, IPAddress subnet, const char* broadcast) {
+
+  /* There is nodes in network */
+  if (CheckNetwork(broadcast)) {
+
+    //ping_resp pingr;
+    //uint32_t info = pingr.total_bytes;
+    //Serial.println("%%%%%%%%%%%%%% %%%%%%%%%%%%%%%");
+    //Serial.println(info);
+    //IPAddress ip(172, 20, 10, 2);
+    //SetNetwork(ip, gateway, subnet);
+
+  }
+
+  /* There is no nodes in the network, therefore this one is the master.  */
+  else {
+    
+    /* Master IP .1 */
+    IPAddress ip(172, 20, 10, 1);
+    SetNetwork(ip, gateway, subnet);
+    return false;
+
+  }
+
 }
