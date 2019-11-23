@@ -30,7 +30,7 @@ void loop() {
   Serial.print("Ping to broadcast: ");
   CheckNetwork("172.20.10.15");
   //Serial.println("Ping to 10.1:");
-  ///CheckNetwork("172.20.10.1");
+  ////CheckNetwork("172.20.10.1");
 
   delay(2000);
 
