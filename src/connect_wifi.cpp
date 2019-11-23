@@ -26,14 +26,14 @@ boolean ConnectWifi(const char* ssid, const char* pass) {
 
 boolean CheckNetwork(const char *addr) {
 
-    bool success = Ping.ping(addr, 3); 
+    bool success = Ping.ping(addr, 1); 
  
     if(!success){
-        Serial.println("Ping failed");
+        Serial.println("Ping failed. There is no nodes in the network, should establish as root!");
         return false;
     }
  
-    Serial.println("Ping succesful.");
+    Serial.println("Ping succesful. There is nodes in the network!");
     return true;
 }
 
@@ -67,7 +67,7 @@ boolean Node_Election(IPAddress gateway, IPAddress subnet, const char* broadcast
 
   /* There is no nodes in the network, therefore this one is the master.  */
   else {
-    
+
     /* Master IP .1 */
     IPAddress ip(172, 20, 10, 1);
     SetNetwork(ip, gateway, subnet);
