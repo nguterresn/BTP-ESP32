@@ -14,7 +14,7 @@ boolean ConnectWifi(const char* ssid, const char* pass);
 /**
  * Check Available Nodes in the network
  * input: addr is the broadcast IP
- * return: true if some node is already on the network, false if not
+ * return: true if some node is already on the network, false if there is no nodes in the network
  * */
 boolean CheckNetwork(const char *addr);
 
@@ -23,10 +23,5 @@ boolean CheckNetwork(const char *addr);
  * */
 boolean SetNetwork(IPAddress ip, IPAddress gateway, IPAddress subnet);
 
-/**
- * Sets Node hierarchy
- * return: returns ip address of the node
- * */
-boolean Node_Election(IPAddress gateway, IPAddress subnet, const char* broadcast);
 
 #endif

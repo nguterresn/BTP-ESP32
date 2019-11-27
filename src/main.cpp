@@ -15,8 +15,10 @@ void setup() {
 
   if (ConnectWifi(SSID, PASS)) {
 
-    /* This function selects node hierarchy */
-    Node_Election(gateway, subnet, broadcastIP);
+    if (!(CheckNetwork(broadcastIP))) {
+        IPAddress ip(172, 20, 10, 1);
+        SetNetwork(ip, gateway, subnet);
+    }
 
   } else {
     Serial.println("Network not available!");
