@@ -3,7 +3,19 @@
 
 #include <WiFi.h>
 #include <Arduino.h>
-#include "ESP32Ping.h"
+#include <stdio.h>
+#include <string.h>
+
+#define ROOT 0
+#define A 1
+#define B 2
+#define C 3
+
+typedef struct{
+    char *ipaddr;
+    uint8_t father;
+    uint8_t *children;
+} node;
 
 /**
  * Establish a WiFi Connection
@@ -12,16 +24,8 @@
 boolean ConnectWifi(const char* ssid, const char* pass);
 
 /**
- * Check Available Nodes in the network
- * input: addr is the broadcast IP
- * return: true if some node is already on the network, false if there is no nodes in the network
- * */
-boolean CheckNetwork(const char *addr);
-
-/**
  * Sets network settings
  * */
-boolean SetNetwork(IPAddress ip, IPAddress gateway, IPAddress subnet);
-
+boolean SetAddress(IPAddress ip, IPAddress gateway, IPAddress subnet);
 
 #endif

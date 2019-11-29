@@ -1,10 +1,13 @@
 #include "connect_wifi.h"
+#include <WiFi.h>
 
 #define BAUD 9600
+#define NUMBER_NODES 3
 
 char SSID[] = "Nuno Guterres";
 char PASS[] = "nuno12345";
-char broadcastIP[] = "172.20.10.15";
+
+uint8_t *macaddr;
 
 IPAddress gateway(172, 20, 10, 14);
 IPAddress subnet(255, 255, 255, 240);
@@ -15,10 +18,30 @@ void setup() {
 
   if (ConnectWifi(SSID, PASS)) {
 
-    if (!(CheckNetwork(broadcastIP))) {
-        IPAddress ip(172, 20, 10, 1);
-        SetNetwork(ip, gateway, subnet);
-    }
+    node* a, b, c;
+
+    WiFi.macAddress(); // A4:CF:12:54:DD:D4
+
+    /*if (!strcmp((const char*)macaddr, "A4:CF:12:54:DD:D4")) {
+        Serial.println("success!!");
+    }*/
+
+    #ifdef A
+      
+      IPAddress ipA(172,20,10,1);
+      SetAddress(ipA, gateway, subnet);
+     /* a = (node*) malloc(sizeof(node));
+
+      a->father = ROOT;
+
+      strcpy(a->ipaddr, "172.20.10.1");
+      
+      a->children[0] = B;
+      a->children[1] = C;
+
+      free(a);*/
+
+    #endif
 
   } else {
     Serial.println("Network not available!");
@@ -27,14 +50,6 @@ void setup() {
 }
 
 void loop() {
-
-  Serial.println("On the loop..");
-  Serial.print("Ping to broadcast: ");
-  CheckNetwork("172.20.10.15");
-  //Serial.println("Ping to 10.1:");
-  ////CheckNetwork("172.20.10.1");
-
-  delay(2000);
 
 
 }

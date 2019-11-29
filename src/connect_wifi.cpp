@@ -1,5 +1,6 @@
 #include "connect_wifi.h"
 
+
 boolean ConnectWifi(const char* ssid, const char* pass) {
 
     uint32_t time_conter = 0;
@@ -24,21 +25,7 @@ boolean ConnectWifi(const char* ssid, const char* pass) {
     return true;
 }
 
-boolean CheckNetwork(const char *addr) {
-
-
-    bool success = Ping.ping(addr, 2); 
- 
-    if(!success){
-        Serial.println("Ping failed. There is no nodes in the network, should establish as root!");
-        return false;
-    }
- 
-    Serial.println("Ping succesful. There is nodes in the network!");
-    return true;
-}
-
-boolean SetNetwork(IPAddress ip, IPAddress gateway, IPAddress subnet) {
+boolean SetAddress(IPAddress ip, IPAddress gateway, IPAddress subnet) {
 
     bool result = WiFi.config(ip, gateway, subnet);
 
@@ -50,4 +37,6 @@ boolean SetNetwork(IPAddress ip, IPAddress gateway, IPAddress subnet) {
     Serial.print("Node is well set: ");
     Serial.println(WiFi.localIP());
     return true;
+
 }
+
