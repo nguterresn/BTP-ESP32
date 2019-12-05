@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ROOT 0
+#define ROOT A
 #define A 1
 #define B 2
 #define C 3
@@ -16,6 +16,22 @@ typedef struct{
     uint8_t father;
     uint8_t *children;
 } node;
+
+typedef struct{
+    int8_t conc_b = B;
+    int8_t conc_c = C;
+} route_A;
+
+typedef struct{
+    int8_t conc_a = A;
+    int8_t conc_c = A;
+} route_B;
+
+typedef struct{
+    int8_t conc_a = A;
+    int8_t conc_b = A;
+} route_C;
+
 
 /**
  * Establish a WiFi Connection
