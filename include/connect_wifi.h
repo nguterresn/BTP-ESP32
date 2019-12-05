@@ -6,32 +6,25 @@
 #include <stdio.h>
 #include <string.h>
 
-#define ROOT A
+/* Serial */
+#define BAUD 9600
+
+/* Cases */
+#define ROOT 0
 #define A 1
 #define B 2
 #define C 3
+#define IP_WIDTH 16
+#define MAC_WIDTH 19
 
-typedef struct{
-    char *ipaddr;
-    uint8_t father;
-    uint8_t *children;
+typedef struct {
+
+    char ipaddr[IP_WIDTH];
+    char macaddr[MAC_WIDTH];
+    uint8_t monkey;
+    uint8_t *banana;
+    
 } node;
-
-typedef struct{
-    int8_t conc_b = B;
-    int8_t conc_c = C;
-} route_A;
-
-typedef struct{
-    int8_t conc_a = A;
-    int8_t conc_c = A;
-} route_B;
-
-typedef struct{
-    int8_t conc_a = A;
-    int8_t conc_b = A;
-} route_C;
-
 
 /**
  * Establish a WiFi Connection
