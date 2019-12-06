@@ -15,16 +15,25 @@
 #define B 2
 #define C 3
 #define IP_WIDTH 16
-#define MAC_WIDTH 19
+#define MAC_WIDTH 30
+#define NUM_BANANAS 2
 
 typedef struct {
 
     char ipaddr[IP_WIDTH];
     char macaddr[MAC_WIDTH];
     uint8_t monkey;
-    uint8_t *banana;
+    uint8_t banana[NUM_BANANAS];
     
 } node;
+
+typedef struct {
+
+    uint8_t route_A;
+    uint8_t route_B;
+    uint8_t route_C;
+    
+} rout;
 
 /**
  * Establish a WiFi Connection
