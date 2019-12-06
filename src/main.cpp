@@ -3,50 +3,52 @@
 char SSID[] = "Nuno Guterres";
 char PASS[] = "nuno12345";
 
-
-
 IPAddress gateway(172, 20, 10, 14);
 IPAddress subnet(255, 255, 255, 240);
 
 void setup() {
 
   Serial.begin(BAUD);
+  node_t* n;
+
+  n = (node_t*) malloc(sizeof(node_t));
+  n->route = (route_t*) malloc(sizeof(route_t));
 
   if (ConnectWifi(SSID, PASS)) {
-
-    
     Serial.println(WiFi.macAddress());
-    if (!strcmp(WiFi.macAddress().c_str(), "A4:CF:12:54:DD:D4")) {
-        Serial.println("success!!");
-     node* a;  
-     rout* rout_a;  
-     #ifdef A
+    if (!strcmp(WiFi.macAddress().c_str(), MAC_A)) {
+      strcpy(n->macaddr, MAC_A);
+      n->ip_id = 1;
+    }
+    else if (!strcmp(WiFi.macAddress().c_str(), MAC_B)) {
+      strcpy(n->macaddr, MAC_B);
+      n->ip_id = 2;
+    }
+    else if (!strcmp(WiFi.macAddress().c_str(), MAC_C)) {
+      strcpy(n->macaddr, MAC_C);
+      n->ip_id = 3;
+    }
+
+    IPAddress ip(172, 20, 10, n->ip_id);
+    SetAddress(ip, gateway, subnet);
+
       
-      IPAddress ipA(172,20,10,1);
-      SetAddress(ipA, gateway, subnet);
 
-      a = (node*) malloc(sizeof(node));
-      rout_a = (rout*) malloc(sizeof(rout));
+      n->monkey = ROOT;
+      strcpy(n->macaddr, "A4:CF:12:54:DD:D4");
+      strcpy(n->ipaddr, IP_A);
+      n->banana[0] = 1;
+      n->banana[1] = 2;
 
-      a->monkey = ROOT;
-      strcpy(a->macaddr, "A4:CF:12:54:DD:D4");
-      strcpy(a->ipaddr, "172.20.10.1");
-      a->banana[0] = B;
-      a->banana[1] = C;
-
-      rout_a->route_A = A;
-      rout_a->route_B = B;
-      rout_a->route_C = C;
-
-
-    #endif
+      n->route->A = 0;
+      n->route->B = 1;
+      n->route->C = 2;
     }
 
     else if (!strcmp(WiFi.macAddress().c_str(), "3C:71:BF:EA:B6:A8")) {
         Serial.println("success!!");
-    
-     #ifdef B
-      //rout* rout_a; 
+   
+      /*rout* rout_a; 
       node* b; 
       IPAddress ipA(172,20,10,2);
       SetAddress(ipA, gateway, subnet);
@@ -66,14 +68,14 @@ void setup() {
       b->banana[1] = 0;
 
 
-    #endif
+*/
     }
     if (!strcmp(WiFi.macAddress().c_str(), "MAC C")) {
         Serial.println("success!!");
 
-     node* c;   
-     #ifdef C
-      
+       
+     /*#ifdef C
+      node* c; 
       IPAddress ipA(172,20,10,3);
       SetAddress(ipA, gateway, subnet);
 
@@ -91,7 +93,7 @@ void setup() {
       c->banana[1] = 0;
 
 
-    #endif
+    #endif*/
     }
 
    
