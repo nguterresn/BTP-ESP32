@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
-char SSID[] = "Nuno Guterres";
-char PASS[] = "nuno12345";
+#define SSID "Nuno Guterres"
+#define PASS "nuno12345"
 
 /**
  * Establish a WiFi Connection

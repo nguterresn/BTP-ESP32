@@ -10,8 +10,10 @@ void setup() {
 
   	if (ConnectWifi(SSID, PASS)) {
 
-		  
-
+		if (NodeSetup()){
+        	Serial.println("Node_setup success!");
+      	}
+      	else Serial.println("Node_setup error!");
     }
     else {
     Serial.println("Network not available!");
@@ -20,6 +22,5 @@ void setup() {
 }
 
 void loop() {
-
 
 }

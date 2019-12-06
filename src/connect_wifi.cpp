@@ -1,6 +1,5 @@
 #include "connect_wifi.h"
 
-
 boolean ConnectWifi(const char* ssid, const char* pass) {
 
     uint32_t time_conter = 0;
@@ -10,9 +9,9 @@ boolean ConnectWifi(const char* ssid, const char* pass) {
     while (WiFi.status() != WL_CONNECTED) {
       delay(1000);
 
-      time_conter += 1000;
+      /*time_conter += 1000;
       if (time_conter > 15000) 
-        return false;
+        return false;|*/
 
       Serial.println("Establishing connection to WiFi...");
     }
