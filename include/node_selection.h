@@ -5,12 +5,19 @@
 #include <Arduino.h>
 #include <stdio.h>
 #include <string.h>
+#include <WiFiUdp.h>
+#include <list> 
+#include <iterator> 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+using namespace std; 
 
 /* SELECTION RELATED */
 #define ROOT 0
 #define IP_WIDTH 16
 #define MAC_WIDTH 30
 #define NUM_BANANAS 2
+#define PORT 6535
 
 #define MAC_A "A4:CF:12:54:DD:D4"
 #define MAC_B "3C:71:BF:EA:B6:A8"
@@ -20,6 +27,13 @@
 #define IP_B "172.20.10.2"
 #define IP_C "172.20.10.3"
 /*********************/
+
+boolean dataToSend = 0;
+boolean dataToExec = 0;
+WiFiUDP udp;
+list<String> DATA_S;
+list<String> DATA_T;
+
 
 /* isto é confuso */
 typedef uint8_t node;
@@ -36,7 +50,7 @@ typedef struct {
     char macaddr[MAC_WIDTH];
     node monkey;
     node banana[NUM_BANANAS];
-    route_t *route;
+    route_t *route_c;
 } node_t;
 
 
@@ -56,5 +70,11 @@ boolean NodeSetup();
  * returns: 0 (false) if an error occurs
  * */
 boolean CreateSocket();
+
+void send_data(void * pvParameters);
+
+void received_data( void * pvParameters );
+
+void control(void * pvParameters);
 
 #endif
