@@ -1,26 +1,32 @@
 #include <FreeRTOS.h>
 #include <WiFiUdp.h>
 #include <freertos/task.h>
+#include <freertos/StackMacros.h>
 #include <btp.h>
 
 #define BAUD 9600
 
 Node n;
 
-void read_task(void * pvParameters) {
-    uint8_t data[5] = {0};
-    Serial.println("Read task started.");
-    data[0] = 50;
+void read_task(void* pvParameters) {
+    while(1)
+        n.readPacket();
+}
+
+void send_task(void* pvParameters) {
+    int inst = 0;
+    Serial.println("Send anything:");
     while(1) {
-        if(data[0] != 50) {
-            Serial.println("Received packet.");
-            Serial.println("From " + n.getNames((node)data[FROM]));
-            Serial.println("To " + n.getNames((node)data[TO]));
-            Serial.println("Message " + n.getNames((node)data[MESSAGE]));
-            data[0] = 6;
+        if(Serial.available()) {
+            while(Serial.available())
+                Serial.read();
+            n.sendPacket(inst);
+            inst++;
+            if(inst == 10)
+                inst = 0;
         }
+        
     }
-    vTaskDelete(NULL);
 }
 
 void setup() {
@@ -42,6 +48,8 @@ void setup() {
         Serial.println("=> Tree well set.");
     else
         Serial.println("=> Tree not well set.\n\n");
+
+    n.startUDP();
     
     Serial.println("+--------------------------------------+");
 
@@ -63,11 +71,12 @@ void setup() {
     Serial.println("+--------------------------------------+\n\n");
     Serial.println("To send a message first give destination then enter, second give the task then enter");
 
-    xTaskCreate(read_task, "Read UDP packets", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    xTaskCreate(read_task, "Read UDP packets", 10000, NULL, 1, NULL);
+    xTaskCreate(send_task, "Send UDP packets", 10000, NULL, 1, NULL);
     //vTaskStartScheduler();
 }
 
 
 void loop() {
-
+    
 }

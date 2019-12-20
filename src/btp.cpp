@@ -53,8 +53,11 @@ bool Node::setTree() {
     
     for(int i = 1; i < (tree_init.find((node)ip_id)->second).size(); i++)
         banana.push_back((node)(tree_init.find((node)ip_id)->second)[i]);
-    udp.begin(6535);
     return true;
+}
+
+void Node::startUDP() {
+    udp.begin(6535);
 }
 
 
@@ -78,8 +81,14 @@ String Node::getNames(node n) {
     return node_names.find(n)->second;
 }
 
-void Node::send_data(uint8_t instruction){
-     uint8_t packet[5];
+void Node::sendPacket(uint8_t instruction){
+    uint8_t packet[5];
+
+    uint8_t pac[5];
+    pac[0] = ip_id + 48;
+    pac[0] = instruction + 48;
+    pac[0] = node_a + 48;
+
 
     if(!DATA_S.empty()) {
         String data = DATA_S.back();
@@ -151,15 +160,22 @@ void Node::send_data(uint8_t instruction){
     }
   }
 
-
-void Node::received_data(uint8_t* data) {
-    uint8_t *aux = data;
-    if(udp.parsePacket()) {
-        udp.read(aux, 5);
-        strcpy((char *) data, (char *) aux);
-    }
-}
-
 WiFiUDP Node::getUDP() {
     return udp;
+}
+
+void Node::readPacket() {
+    uint8_t data[5] = {0}, size = 0;
+    size = udp.parsePacket();
+    if(size > 0) {
+        udp.read(data, 5);
+        Serial.println("Received packet.");
+        Serial.print("From ");
+        Serial.println(getNames((node)(data[FROM] - 48)));
+        Serial.print("To ");
+        Serial.println(getNames((node)(data[TO] - 48)));
+        Serial.print("Message ");
+        Serial.println(data[MESSAGE]- 48);
+        udp.flush();
+    }
 }
