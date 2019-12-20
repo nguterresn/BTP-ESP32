@@ -84,11 +84,11 @@ String Node::getNames(node n) {
 void Node::sendPacket(uint8_t instruction){
     uint8_t packet[5];
 
-    uint8_t pac[5];
-    pac[0] = ip_id + 48;
-    pac[0] = instruction + 48;
-    pac[0] = node_a + 48;
-
+    char pac[5];
+    pac[0] = ip_id;
+    pac[1] = instruction;
+    pac[2] = node_a;
+    DATA_S.push_front(String(pac));
 
     if(!DATA_S.empty()) {
         String data = DATA_S.back();
@@ -97,10 +97,10 @@ void Node::sendPacket(uint8_t instruction){
         if(data[2] == getMonkey() || 
         std::find(getBananas().begin(),getBananas().end(),data[2]) != getBananas().end()){ 
         // Destination is father or children
-            packet[0] = data[0];
-            packet[1] = data[1];
-            packet[2] = data[2];
-            packet[3] = ip_id;
+            packet[0] = data[0] + 48;
+            packet[1] = data[1] + 48;
+            packet[2] = data[2] + 48;
+            packet[3] = ip_id + 48;
             IPAddress ip(172,20,10,data[2]);
             udp.beginPacket(ip,6535);
             udp.write(packet,5);

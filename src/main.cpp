@@ -17,15 +17,11 @@ void send_task(void* pvParameters) {
     int inst = 0;
     Serial.println("Send anything:");
     while(1) {
-        if(Serial.available()) {
-            while(Serial.available())
-                Serial.read();
             n.sendPacket(inst);
             inst++;
             if(inst == 10)
                 inst = 0;
-        }
-        
+        delay(1000);
     }
 }
 
@@ -71,12 +67,12 @@ void setup() {
     Serial.println("+--------------------------------------+\n\n");
     Serial.println("To send a message first give destination then enter, second give the task then enter");
 
-    xTaskCreate(read_task, "Read UDP packets", 10000, NULL, 1, NULL);
+    //xTaskCreate(read_task, "Read UDP packets", 10000, NULL, 1, NULL);
     xTaskCreate(send_task, "Send UDP packets", 10000, NULL, 1, NULL);
     //vTaskStartScheduler();
 }
 
 
 void loop() {
-    
+    delay(10000);
 }
