@@ -23,6 +23,7 @@ class Node {
         node getMonkey();
         std::vector <node> getBananas();
         String getNames(node n);
+        String getSSID();
         void sendPacket(uint8_t instruction);
         WiFiUDP getUDP();
         void readPacket();

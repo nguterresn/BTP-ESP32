@@ -21,16 +21,10 @@ std::map <node, std::vector <node>> tree_init {
 };
 
 bool Node::connectWifi() {
-    uint32_t time = 0;
-
     WiFi.begin(NET, PASS);
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        time += 1000;
-        if (time > 15000)
+    while (WiFi.status() != WL_CONNECTED)
             return false;
-    }
 
     ip_id = mac_t.find(WiFi.macAddress().c_str())->second;
 
@@ -79,6 +73,10 @@ std::vector <node> Node::getBananas() {
 
 String Node::getNames(node n) {
     return node_names.find(n)->second;
+}
+
+String Node::getSSID() {
+    return WiFi.SSID();
 }
 
 void Node::sendPacket(uint8_t instruction){
