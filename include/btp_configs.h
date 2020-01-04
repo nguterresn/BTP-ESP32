@@ -21,3 +21,7 @@
 #define TO 2
 
 typedef enum node {root, node_a, node_b, node_c, no_node} node;
+
+typedef enum instruc {LED, HELLO, RECONF} instruc;
+
+typedef enum ret_t {KEEP, FOWARD, IGNORE, ERROR, EMPTY} ret_t;

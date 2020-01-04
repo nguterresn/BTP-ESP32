@@ -8,62 +8,90 @@
 
 Node n;
 
-void read_task(void* pvParameters) {
-    while(1)
-        n.readPacket();
-}
+instruc instruction;
+node destination;
 
 void send_task(void* pvParameters) {
-    int inst = 0;
-    Serial.println("Send anything:");
-    while(1) {
-        if(Serial.available()){
-            Serial.read();
-            n.sendPacket(inst);
-            inst++;
-            if(inst == 10)
-                inst = 0;
-        }    
-        delay(1000);
+    char data[5];
+
+    strcpy(data, (char*)pvParameters);
+
+    n.sendPacket((uint8_t*)data);
+
+    vTaskDelete(NULL);
+}
+
+void read_task(void* pvParameters) {
+    ret_t ret;
+    TickType_t xLastWakeTime;
+    TickType_t freq_ticks = 50;  // Periodic task of 50ms
+    xLastWakeTime = xTaskGetTickCount();
+    uint8_t data[5];
+    while(1){
+        ret = n.readPacket(data);
+        if(ret != EMPTY) {
+            Serial.println("Received packet.");
+            Serial.print("From ");
+            Serial.println(n.getNames((node)(data[FROM] - 48)));
+            Serial.print("To ");
+            Serial.println(n.getNames((node)(data[TO] - 48)));
+            Serial.print("Instruction:  ");
+            Serial.println(n.getInstruction((instruc)(data[MESSAGE]- 48)));
+
+            if(ret == KEEP) {
+                Serial.println("Process message.");
+            } else if(ret == FOWARD) {
+                Serial.println("Foward message");
+                xTaskCreate(send_task, "Send UDP packets", 10000, (void*)data, configMAX_PRIORITIES - 1, NULL);
+            } else if(ret == IGNORE) {
+                Serial.println("Ignore message");
+            }
+        }
+        vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
 }
 
-void setup() {
-	Serial.begin(BAUD);
-    Serial.println("\n***************************************");
-    Serial.println("Routine start.");
-  	
-    uint8_t count = 0;
-    while(!n.connectWifi()) {
-        if(count < 14)
-            Serial.println("Connecting to WiFi...");
-        else if(count == 14) {
-            Serial.println("Cannot connect to WiFi. Restarting in: ");
-            Serial.println((24 - count));
-        } else if(count > 14) {
-            if(count == 24) 
-                ESP.restart();
-            Serial.println((24 - count)); 
-        }       
-        count++;
-        delay(1000);
+void check_serial(void* pvParameters) {
+    TaskHandle_t t = ((TaskHandle_t*)pvParameters)[0];
+
+    TickType_t xLastWakeTime;
+    TickType_t freq_ticks = 100;  // Periodic task of 100ms
+    xLastWakeTime = xTaskGetTickCount();
+
+    while(1) {
+        Serial.println("Checking serial port.");
+        if(Serial.available() > 0) {
+            vTaskResume(t);
+            vTaskDelete(NULL);
+        }
+        vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
+}
 
-    Serial.print("Connected to WiFi network ");
-    Serial.println(n.getSSID());
 
-    if(n.setIP())
-        Serial.println("=> IP well set.");
-    else
-        Serial.println("=> IP not well set.");
+void control_task(void *pvParameters) {
+    while(1) {
+        Serial.println("Enter command: ");
+        xTaskCreate(check_serial, "Check Serial Port", 1000, (void*)(xTaskGetCurrentTaskHandle()), configMAX_PRIORITIES - 1, NULL);
+        vTaskSuspend(NULL);
 
-    if(n.setTree())
-        Serial.println("=> Tree well set.");
-    else
-        Serial.println("=> Tree not well set.\n\n");
+        char cmd[10];
+        uint8_t i = 0;
 
-    n.startUDP();
-    
+        while(Serial.available())
+            cmd[i++] = Serial.read();
+        
+        if(strcmp(cmd, "send")) {
+            uint8_t packet[5];
+            packet[FROM] = n.getID();
+            packet[TO] = node_a;
+            packet[MESSAGE] = LED;
+            xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+        }
+    }
+}
+
+void get_info() {
     Serial.println("+--------------------------------------+");
 
     Serial.println("|   Node info:");
@@ -82,14 +110,39 @@ void setup() {
     Serial.print("|   IP address: ");
     Serial.println(n.getIP());
     Serial.println("+--------------------------------------+\n\n");
-    Serial.println("To send a message first give destination then enter, second give the task then enter");
-
-    xTaskCreate(read_task, "Read UDP packets", 10000, NULL, 1, NULL);
-    xTaskCreate(send_task, "Send UDP packets", 10000, NULL, 1, NULL);
-    //vTaskStartScheduler();
 }
 
+void setup() {
+    // Start code
+	Serial.begin(BAUD);
+    Serial.println("\n***************************************");
+    Serial.println("Routine start.");
+    
+    if(!n.connectWifi()) {
+        Serial.println("\nCannot connect to WiFi. Rebooting... ");
+        ESP.restart();
+    }
+
+    Serial.println("\nConnected to WiFi network.");
+
+    if(n.setIP())
+        Serial.println("=> IP well set.");
+    else
+        Serial.println("=> IP not well set.");
+
+    if(n.setTree())
+        Serial.println("=> Tree well set.");
+    else
+        Serial.println("=> Tree not well set.\n\n");
+
+    n.startUDP();
+    
+    get_info();
+    
+    xTaskCreate(read_task, "Read UDP packets", 10000, NULL, configMAX_PRIORITIES - 1, NULL);
+    xTaskCreate(control_task, "Control", 10000, NULL, configMAX_PRIORITIES - 1, NULL);
+}
 
 void loop() {
-    delay(10000);
+
 }

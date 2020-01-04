@@ -20,11 +20,27 @@ std::map <node, std::vector <node>> tree_init {
     {node_c, {node_a}}
 };
 
+std::map <instruc, String> instructions {
+    {LED, "Change LED state"},
+    {HELLO, "Say Hello"},
+    {RECONF, "Reconfigure tree"}
+};
+
 bool Node::connectWifi() {
+    uint8_t count = 0;
+    Serial.print("Connecting to WiFi.");
+    vTaskDelay(1000);
+
     WiFi.begin(NET, PASS);
 
-    while (WiFi.status() != WL_CONNECTED)
-            return false;
+    while(WiFi.status() != WL_CONNECTED) {
+        if(count < 14)
+            Serial.print(".");
+        else if(count == 14)
+            return false ;
+        count++;
+        vTaskDelay(1000);
+    }
 
     ip_id = mac_t.find(WiFi.macAddress().c_str())->second;
 
@@ -51,7 +67,7 @@ bool Node::setTree() {
 }
 
 void Node::startUDP() {
-    udp.begin(6535);
+    udp.begin(PORT);
 }
 
 
@@ -79,101 +95,80 @@ String Node::getSSID() {
     return WiFi.SSID();
 }
 
-void Node::sendPacket(uint8_t instruction){
-    uint8_t packet[5];
+String Node::getInstruction(instruc i) {
+    return instructions.find(i)->second;
+}
 
-    char pac[5];
-    pac[0] = ip_id;
+void Node::sendPacket(node from, node to, instruc instruction) {
+    uint8_t packet[5], pac[5];
+
+    pac[0] = from;
     pac[1] = instruction;
-    pac[2] = node_a;
-    DATA_S.push_front(String(pac));
+    pac[2] = to;
+
+    DATA_S.push_front(pac);
 
     if(!DATA_S.empty()) {
-        String data = DATA_S.back();
+        uint8_t* data = DATA_S.back();
         DATA_S.pop_back();
 
-        if(data[2] == getMonkey() || 
-        std::find(getBananas().begin(),getBananas().end(),data[2]) != getBananas().end()){ 
-        // Destination is father or children
-            packet[0] = data[0] + 48;
-            packet[1] = data[1] + 48;
-            packet[2] = data[2] + 48;
-            packet[3] = ip_id + 48;
-            IPAddress ip(172,20,10,data[2]);
-            udp.beginPacket(ip,6535);
-            udp.write(packet,5);
-            udp.endPacket();
+        packet[0] = data[0] + 48;
+        packet[1] = data[1] + 48;
+        packet[2] = data[2] + 48;
+        Serial.println(data[2]);
+        IPAddress ip(172, 20, 10, data[2]);
 
-        }
-        else if(data[3] == getMonkey()){
-        // Only know that I received from father and that the destination address is not a neightbor
-            packet[0] = data[0];
-            packet[1] = data[1];
-            packet[2] = data[2];
-            packet[3] = ip_id;
-            for(int i = 0; i<getBananas().size();i++){
-                IPAddress ip(172,20,10,getBananas().at(i));
-                udp.beginMulticast(ip,6535);
-            }
-            udp.beginMulticastPacket();
-            udp.write(packet,5);
-            udp.endPacket();
-        
-        }
-        else if(std::find(getBananas().begin(),getBananas().end(),data[3]) != getBananas().end()){
-            //Received from children and destination is not a neightbor
-            packet[0] = data[0];
-            packet[1] = data[1];
-            packet[2] = data[2];
-            packet[3] = ip_id;
-            for(int i = 0; i<getBananas().size();i++){
-                if(data[3]!=getBananas().at(i)){
-                IPAddress ip(172,20,10,getBananas().at(i));
-                udp.beginMulticast(ip,6535);
-                }
-            }
-            IPAddress ip(172,20,10,getMonkey());
-            udp.beginMulticast(ip,6535);
-            udp.beginMulticastPacket();
-            udp.write(packet,5);
-            udp.endPacket();
-        }
-        else if(data[1] == getID()){ 
-        //Send data to a destiantion that is not a neightbor and i didnt received from anyone
-            packet[0] = data[0];
-            packet[1] = data[1];
-            packet[2] = data[2];
-            packet[3] = ip_id;
-            for(int i = 0; i<getBananas().size();i++){
-                IPAddress ip(172,20,10,getBananas().at(i));
-                udp.beginMulticast(ip,6535);
-            }
-            IPAddress ip(172,20,10,getMonkey());
-            udp.beginMulticast(ip,6535);
-            udp.beginMulticastPacket();
-            udp.write(packet,5);
-            udp.endPacket();
-
-        }
+        udp.beginPacket(ip, PORT);
+        udp.write(packet, 5);
+        udp.endPacket();
     }
+  }
+
+  void Node::sendPacket(uint8_t* data) {
+    this->sendPacket((node)data[0], (node)data[1], (instruc)data[2]);
   }
 
 WiFiUDP Node::getUDP() {
     return udp;
 }
 
-void Node::readPacket() {
+ret_t Node::readPacket(uint8_t* par) {
     uint8_t data[5] = {0}, size = 0;
     size = udp.parsePacket();
+
     if(size > 0) {
-        udp.read(data, 5);
-        Serial.println("Received packet.");
-        Serial.print("From ");
-        Serial.println(getNames((node)(data[FROM] - 48)));
-        Serial.print("To ");
-        Serial.println(getNames((node)(data[TO] - 48)));
-        Serial.print("Message ");
-        Serial.println(data[MESSAGE]- 48);
+        udp.read(data, size);
+        strcpy((char*)par, (char*)data);
         udp.flush();
+        if((node)(data[FROM] - 48) == ip_id) 
+            return KEEP;
+        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0) 
+            return FOWARD;
+        else
+            return IGNORE;
     }
+    return EMPTY;
+}
+
+void Node::scanNetworks() {
+    int n = WiFi.scanNetworks();
+    Serial.println("scan done");
+    if (n == 0) {
+        Serial.println("no networks found");
+    } else {
+        Serial.print(n);
+        Serial.println(" networks found");
+        for (int i = 0; i < n; ++i) {
+            // Print SSID and RSSI for each network found
+            Serial.print(i + 1);
+            Serial.print(": ");
+            Serial.print(WiFi.SSID(i));
+            Serial.print(" (");
+            Serial.print(WiFi.RSSI(i));
+            Serial.print(")");
+            Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+            delay(10);
+        }
+    }
+    Serial.println("");
 }

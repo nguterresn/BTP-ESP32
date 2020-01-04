@@ -9,9 +9,8 @@ class Node {
         uint8_t ip_id;
         node monkey;
         std::vector <node> banana;
-        std::list<String> DATA_S;
-        std::list<String> DATA_T;
-        std::array<String,5> packet;
+        std::list<uint8_t*> DATA_S;
+        std::array<String, 5> packet;
         WiFiUDP udp;
     public:
         bool setTree();
@@ -23,10 +22,13 @@ class Node {
         node getMonkey();
         std::vector <node> getBananas();
         String getNames(node n);
+        String getInstruction(instruc i);
         String getSSID();
-        void sendPacket(uint8_t instruction);
+        void sendPacket(node from, node to, instruc instruction);
+        void sendPacket(uint8_t *data);
         WiFiUDP getUDP();
-        void readPacket();
+        ret_t readPacket(uint8_t* par);
+        void scanNetworks();
 };
 
 
