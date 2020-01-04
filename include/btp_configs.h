@@ -16,12 +16,13 @@
 
 #define MONKEY 0
 
-#define FROM 0
+#define FROM    0
 #define MESSAGE 1
-#define TO 2
+#define TO      2
+#define TARZAN  3
 
 typedef enum node {root, node_a, node_b, node_c, no_node} node;
 
-typedef enum instruc {LED, HELLO, RECONF} instruc;
+typedef enum instruc {LED, HELLO, HELLO_BACK, RECONF} instruc;
 
 typedef enum ret_t {KEEP, FOWARD, IGNORE, ERROR, EMPTY} ret_t;

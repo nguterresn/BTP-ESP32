@@ -20,11 +20,14 @@ class Node {
         int8_t getID();
         void startUDP();
         node getMonkey();
+        bool checkTree(char c);
+        void createPacket(uint8_t* packet, node to, node from, node tarzan, instruc instruction);
+        bool checkTree(node c);
         std::vector <node> getBananas();
         String getNames(node n);
         String getInstruction(instruc i);
         String getSSID();
-        void sendPacket(node from, node to, instruc instruction);
+        void sendPacket(node from, node to, node tarzan, instruc instruction);
         void sendPacket(uint8_t *data);
         WiFiUDP getUDP();
         ret_t readPacket(uint8_t* par);

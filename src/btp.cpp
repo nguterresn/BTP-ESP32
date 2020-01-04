@@ -20,9 +20,11 @@ std::map <node, std::vector <node>> tree_init {
     {node_c, {node_a}}
 };
 
+
 std::map <instruc, String> instructions {
     {LED, "Change LED state"},
     {HELLO, "Say Hello"},
+    {HELLO_BACK, "Hello to you too!"},
     {RECONF, "Reconfigure tree"}
 };
 
@@ -99,12 +101,36 @@ String Node::getInstruction(instruc i) {
     return instructions.find(i)->second;
 }
 
-void Node::sendPacket(node from, node to, instruc instruction) {
+
+
+void Node::createPacket(uint8_t* packet, node to, node from, node tarzan, instruc instruction) {
+    packet[FROM] = from;
+    packet[TO] = to;
+    packet[MESSAGE] = instruction;
+    packet[TARZAN] = tarzan;
+}
+
+bool Node::checkTree(node c) {
+    for(int i = 0; i < this->getBananas().size(); i++) {
+        if(c == this->getBananas().at(i))
+            return true;
+    }
+    if(c == this->getMonkey())
+        return true;
+    return false;
+}
+
+bool Node::checkTree(char c) {
+    return this->checkTree((node)(c - 96));
+}
+
+void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
     uint8_t packet[5], pac[5];
 
-    pac[0] = from;
-    pac[1] = instruction;
-    pac[2] = to;
+    pac[FROM] = from;
+    pac[MESSAGE] = instruction;
+    pac[TO] = to;
+    pac[TARZAN] = tarzan;
 
     DATA_S.push_front(pac);
 
@@ -112,20 +138,37 @@ void Node::sendPacket(node from, node to, instruc instruction) {
         uint8_t* data = DATA_S.back();
         DATA_S.pop_back();
 
-        packet[0] = data[0] + 48;
-        packet[1] = data[1] + 48;
-        packet[2] = data[2] + 48;
-        Serial.println(data[2]);
-        IPAddress ip(172, 20, 10, data[2]);
+        packet[FROM] = data[FROM] + 48;
+        packet[MESSAGE] = data[MESSAGE] + 48;
+        packet[TO] = data[TO] + 48;
+        packet[TARZAN] = ip_id + 48;
 
-        udp.beginPacket(ip, PORT);
-        udp.write(packet, 5);
-        udp.endPacket();
+        if(this->checkTree((node)data[TO])){
+            IPAddress ip(172, 20, 10, data[TO]);
+            udp.beginPacket(ip, PORT);
+            udp.write(packet, 5);
+            udp.endPacket();
+        } else {
+            for(int i = 0; i < this->getBananas().size(); i++){
+                if(this->getBananas().at(i) != data[TARZAN]) {
+                    IPAddress ip(172, 20, 10, getBananas().at(i));
+                    udp.beginPacket(ip, PORT);
+                    udp.write(packet, 5);
+                    udp.endPacket();
+                }
+            }
+            if(this->getMonkey() != root && this->getMonkey() != data[TARZAN]) {
+                IPAddress ip(172, 20, 10, this->getMonkey());
+                udp.beginPacket(ip, PORT);
+                udp.write(packet, 5);
+                udp.endPacket();
+            }
+        }
     }
   }
 
   void Node::sendPacket(uint8_t* data) {
-    this->sendPacket((node)data[0], (node)data[1], (instruc)data[2]);
+    this->sendPacket((node)data[FROM], (node)data[TO], (node)data[TARZAN], (instruc)data[1]);
   }
 
 WiFiUDP Node::getUDP() {
@@ -140,7 +183,7 @@ ret_t Node::readPacket(uint8_t* par) {
         udp.read(data, size);
         strcpy((char*)par, (char*)data);
         udp.flush();
-        if((node)(data[FROM] - 48) == ip_id) 
+        if((node)(data[TO] - 48) == ip_id) 
             return KEEP;
         else if((tree_init.find((node)ip_id)->second).size() - 1 > 0) 
             return FOWARD;
