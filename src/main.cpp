@@ -69,7 +69,7 @@ void read_task(void* pvParameters) {
                 Serial.println("Process message.");
                 if((data[MESSAGE] - 48) == HELLO) {
                     Serial.println("Replying...");
-                    n.createPacket(packet, (node)data[FROM], (node)n.getID(), (node)n.getID(), HELLO_BACK);
+                    n.createPacket(packet, (node)data[FROM], (node)(n.getID() + 48), (node)(n.getID() + 48), (instruc)(HELLO_BACK + 48));
 
                     Serial.println("Created packet.");
                     Serial.print("From ");
