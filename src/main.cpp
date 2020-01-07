@@ -11,6 +11,8 @@ Node n;
 instruc instruction;
 node destination;
 
+TaskHandle_t t;
+
 void get_info() {
     Serial.println("+--------------------------------------+");
 
@@ -61,12 +63,24 @@ void read_task(void* pvParameters) {
             Serial.print("Message:  ");
             Serial.println(n.getInstruction((instruc)(data[MESSAGE]- 48)));
             Serial.print("Tarzan:  ");
-            Serial.println(n.getInstruction((instruc)(data[TARZAN]- 48)));
+            Serial.println(n.getNames((node)(data[TARZAN]- 48)));
 
             if(ret == KEEP) {
                 Serial.println("Process message.");
-                if(data[MESSAGE] == HELLO) {
+                if((data[MESSAGE] - 48) == HELLO) {
+                    Serial.println("Replying...");
                     n.createPacket(packet, (node)data[FROM], (node)n.getID(), (node)n.getID(), HELLO_BACK);
+
+                    Serial.println("Created packet.");
+                    Serial.print("From ");
+                    Serial.println(n.getNames((node)(packet[FROM] - 48)));
+                    Serial.print("To ");
+                    Serial.println(n.getNames((node)(packet[TO] - 48)));
+                    Serial.print("Message:  ");
+                    Serial.println(n.getInstruction((instruc)(packet[MESSAGE]- 48)));
+                    Serial.print("Tarzan:  ");
+                    Serial.println(n.getNames((node)(packet[TARZAN]- 48)));
+
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
             } else if(ret == FOWARD) {
@@ -129,7 +143,7 @@ void control_task(void *pvParameters) {
             if(n.checkTree(cmd[6])) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
-                packet[MESSAGE] = HELLO_BACK;
+                packet[MESSAGE] = HELLO;
                 packet[TARZAN] = n.getID();
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
             } else 
