@@ -143,18 +143,13 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
         packet[TO] = data[TO] + 48;
         packet[TARZAN] = ip_id + 48;
 
-        Serial.print("Sending packet ");
-        
         if(this->checkTree((node)data[TO])){
-            Serial.print("directly to ");
-            Serial.println(getNames((node)(data[TO])));
-
             IPAddress ip(172, 20, 10, data[TO]);
+            Serial.println("Staring to send...");
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
             udp.endPacket();
         } else {
-            Serial.println("via multicast");
             for(int i = 0; i < this->getBananas().size(); i++){
                 if(this->getBananas().at(i) != data[TARZAN]) {
                     IPAddress ip(172, 20, 10, getBananas().at(i));
@@ -168,25 +163,10 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
                 udp.beginPacket(ip, PORT);
                 udp.write(packet, 5);
                 udp.endPacket();
-            }  
+            }
         }
-        printPacket(packet);
     }
   }
-
-  void Node::printPacket(uint8_t* d) {
-    Serial.println("****************************************");
-    Serial.print("From ");
-    Serial.println(getNames((node)(d[FROM] - 48)));
-    Serial.print("To ");
-    Serial.println(getNames((node)(d[TO] - 48)));
-    Serial.print("Message:  ");
-    Serial.println(getInstruction((instruc)(d[MESSAGE] - 48)));
-    Serial.print("Tarzan:  ");
-    Serial.println(getNames((node)(d[TARZAN] - 48)));
-    Serial.println("****************************************");
-  }
-
 
   void Node::sendPacket(uint8_t* data) {
     this->sendPacket((node)data[FROM], (node)data[TO], (node)data[TARZAN], (instruc)data[MESSAGE]);
@@ -206,7 +186,7 @@ ret_t Node::readPacket(uint8_t* par) {
         udp.flush();
         if((node)(data[TO] - 48) == ip_id) 
             return KEEP;
-        else if((monkey == root ? 0 : 1) + banana.size() - 1 > 0) 
+        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0) 
             return FOWARD;
         else
             return IGNORE;
