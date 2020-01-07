@@ -145,6 +145,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
 
         if(this->checkTree((node)data[TO])){
             IPAddress ip(172, 20, 10, data[TO]);
+            Serial.println("Staring to send...");
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
             udp.endPacket();
@@ -168,7 +169,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
   }
 
   void Node::sendPacket(uint8_t* data) {
-    this->sendPacket((node)data[FROM], (node)data[TO], (node)data[TARZAN], (instruc)data[1]);
+    this->sendPacket((node)data[FROM], (node)data[TO], (node)data[TARZAN], (instruc)data[MESSAGE]);
   }
 
 WiFiUDP Node::getUDP() {
@@ -180,7 +181,7 @@ ret_t Node::readPacket(uint8_t* par) {
     size = udp.parsePacket();
 
     if(size > 0) {
-        udp.read(data, size);
+        udp.read(data, 5);
         strcpy((char*)par, (char*)data);
         udp.flush();
         if((node)(data[TO] - 48) == ip_id) 

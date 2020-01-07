@@ -11,7 +11,26 @@ Node n;
 instruc instruction;
 node destination;
 
-TaskHandle_t t;
+void get_info() {
+    Serial.println("+--------------------------------------+");
+
+    Serial.println("|   Node info:");
+    Serial.println("+--------------------------------------+");
+    Serial.print("|   Node id: ");
+    Serial.println(n.getNames((node)n.getID()));
+    Serial.println("+--------------------------------------+");
+    Serial.print("|   Monkey: ");
+    Serial.println(n.getNames(n.getMonkey()));
+    Serial.println("+--------------------------------------+");
+    Serial.print("|   Bananas: ");
+    for(int i = 0; i < n.getBananas().size(); i++) {
+        Serial.print(n.getNames(n.getBananas()[i]) + ", ");
+    }
+    Serial.println("\n+--------------------------------------+");
+    Serial.print("|   IP address: ");
+    Serial.println(n.getIP());
+    Serial.println("+--------------------------------------+\n\n");
+}
 
 void send_task(void* pvParameters) {
     char data[5];
@@ -76,7 +95,6 @@ void check_serial(void* pvParameters) {
     }
 }
 
-
 void control_task(void *pvParameters) {
     uint8_t i = 0;
     char cmd[10], c = 0;
@@ -116,29 +134,10 @@ void control_task(void *pvParameters) {
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
             } else 
                 Serial.println("Node is not in the network!");
+        } else if(!strcmp(cmd, "info")) {
+            get_info();
         }
     }
-}
-
-void get_info() {
-    Serial.println("+--------------------------------------+");
-
-    Serial.println("|   Node info:");
-    Serial.println("+--------------------------------------+");
-    Serial.print("|   Node id: ");
-    Serial.println(n.getNames((node)n.getID()));
-    Serial.println("+--------------------------------------+");
-    Serial.print("|   Monkey: ");
-    Serial.println(n.getNames(n.getMonkey()));
-    Serial.println("+--------------------------------------+");
-    Serial.print("|   Bananas: ");
-    for(int i = 0; i < n.getBananas().size(); i++) {
-        Serial.print(n.getNames(n.getBananas()[i]) + ", ");
-    }
-    Serial.println("\n+--------------------------------------+");
-    Serial.print("|   IP address: ");
-    Serial.println(n.getIP());
-    Serial.println("+--------------------------------------+\n\n");
 }
 
 void setup() {
