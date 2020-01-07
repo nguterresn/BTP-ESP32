@@ -196,8 +196,9 @@ ret_t Node::readPacket(uint8_t* par) {
         udp.flush();
         if((node)(data[TO] - 48) == ip_id) 
             return KEEP;
-        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0) 
+        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0){
             return FOWARD;
+        }   
         else
             return IGNORE;
     }

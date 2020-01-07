@@ -75,6 +75,10 @@ void read_task(void* pvParameters) {
                 }
             } else if(ret == FOWARD) {
                 Serial.println("Foward message");
+                 data[FROM] = data[FROM] - 48;
+                 data[MESSAGE] = data[MESSAGE] - 48;
+                 data[TO] = data[TO] - 48;
+                 data[TARZAN] = (node)(n.getID());
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)data, configMAX_PRIORITIES - 1, NULL);
             } else if(ret == IGNORE) {
                 Serial.println("Ignore message");
