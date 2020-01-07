@@ -130,7 +130,7 @@ void control_task(void *pvParameters) {
         memset(packet, 0, 5);
 
         if(!strncmp(cmd, "hello ", 6)) {
-            if(n.checkTree(cmd[6])) {
+            if(cmd[6]-96 >= 1 && cmd[6]-96<=3) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
                 packet[MESSAGE] = HELLO;
