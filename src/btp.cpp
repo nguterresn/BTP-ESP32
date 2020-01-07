@@ -23,7 +23,7 @@ std::map <node, std::vector <node>> tree_init {
 
 std::map <instruc, String> instructions {
     {LED, "Change LED state"},
-    {HELLO, "Say Hello"},
+    {HELLO, "Hello"},
     {HELLO_BACK, "Hello to you too!"},
     {RECONF, "Reconfigure tree"}
 };
@@ -104,10 +104,10 @@ String Node::getInstruction(instruc i) {
 
 
 void Node::createPacket(uint8_t* packet, node to, node from, node tarzan, instruc instruction) {
-    packet[FROM] = from + 48;
-    packet[TO] = to + 48;
-    packet[MESSAGE] = instruction + 48;
-    packet[TARZAN] = tarzan + 48;
+    packet[FROM] = from;
+    packet[TO] = to;
+    packet[MESSAGE] = instruction;
+    packet[TARZAN] = tarzan;
 }
 
 bool Node::checkTree(node c) {
