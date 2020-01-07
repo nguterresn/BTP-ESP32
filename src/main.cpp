@@ -57,20 +57,20 @@ void read_task(void* pvParameters) {
         if(ret != EMPTY) {
             Serial.println("Received packet.");
             Serial.print("From ");
-            Serial.println(n.getNames((node)_INT(data[FROM])));
+            Serial.println(n.getNames((node)(data[FROM] - 48)));
             Serial.print("To ");
-            Serial.println(n.getNames((node)_INT(data[TO])));
+            Serial.println(n.getNames((node)(data[TO] - 48)));
             Serial.print("Message:  ");
-            Serial.println(n.getInstruction((instruc)_INT(data[MESSAGE])));
+            Serial.println(n.getInstruction((instruc)(data[MESSAGE] - 48)));
             Serial.print("Tarzan:  ");
-            Serial.println(n.getNames((node)_INT(data[TARZAN])));
+            Serial.println(n.getNames((node)(data[TARZAN] - 48)));
 
             if(ret == KEEP) {
                 Serial.println("Process message.");
-                if(_INT(data[MESSAGE]) == HELLO) {
+                if((data[MESSAGE] - 48) == HELLO) {
                     Serial.println("Replying...");
                     memset(packet, 0, 5);
-                    n.createPacket(packet, (node)_INT(data[FROM]), (node)n.getID(), (node)n.getID(), HELLO_BACK);
+                    n.createPacket(packet, (node)(data[FROM] - 48), (node)n.getID(), (node)n.getID(), HELLO_BACK);
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
             } else if(ret == FOWARD) {
@@ -117,7 +117,7 @@ void control_task(void *pvParameters) {
 
         while(Serial.available()) {
             c = Serial.read();
-            if(c != '.') {
+            if(c != '\n') {
                 cmd[i++] = c;
                 Serial.print(c);
                 xTaskCreate(check_serial, "Check Serial Port", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
@@ -131,10 +131,7 @@ void control_task(void *pvParameters) {
 
         if(!strncmp(cmd, "hello ", 6)) {
             if(n.checkTree(cmd[6])) {
-                packet[FROM] = n.getID();
-                packet[TO] = cmd[6] - 96; // because nodes start at 1
-                packet[MESSAGE] = HELLO;
-                packet[TARZAN] = n.getID();
+                n.createPacket(packet, (node)(cmd[6] - 96), (node)(n.getID()), (node)(n.getID()), HELLO);
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
             } else 
                 Serial.println("Node is not in the network!");

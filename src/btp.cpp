@@ -138,18 +138,23 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
         uint8_t* data = DATA_S.back();
         DATA_S.pop_back();
 
-        packet[FROM] = _CHAR(data[FROM]);
-        packet[MESSAGE] = _CHAR(data[MESSAGE]);
-        packet[TO] = _CHAR(data[TO]);
-        packet[TARZAN] = _CHAR(ip_id);
+        packet[FROM] = data[FROM] + 48;
+        packet[MESSAGE] = data[MESSAGE] + 48;
+        packet[TO] = data[TO] + 48;
+        packet[TARZAN] = ip_id + 48;
+
+        Serial.print("Sending packet ");
+        
 
         if(this->checkTree((node)data[TO])){
+            Serial.print("directly to ");
+            Serial.println(getNames((node)(packet[TO])));
             IPAddress ip(172, 20, 10, data[TO]);
-            Serial.println("Starting to send...");
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
             udp.endPacket();
         } else {
+            Serial.println("via multicast");
             for(int i = 0; i < this->getBananas().size(); i++){
                 if(this->getBananas().at(i) != data[TARZAN]) {
                     IPAddress ip(172, 20, 10, getBananas().at(i));
@@ -164,9 +169,25 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
                 udp.write(packet, 5);
                 udp.endPacket();
             }
+            
         }
+        printPacket(packet);
     }
   }
+
+  void Node::printPacket(uint8_t* data) {
+    Serial.println("****************************************");
+    Serial.print("From ");
+    Serial.println(getNames((node)(data[FROM] - 48)));
+    Serial.print("To ");
+    Serial.println(getNames((node)(data[TO] - 48)));
+    Serial.print("Message:  ");
+    Serial.println(getInstruction((instruc)(data[MESSAGE] - 48)));
+    Serial.print("Tarzan:  ");
+    Serial.println(getNames((node)(data[TARZAN] - 48)));
+    Serial.println("****************************************");
+  }
+
 
   void Node::sendPacket(uint8_t* data) {
     this->sendPacket((node)data[FROM], (node)data[TO], (node)data[TARZAN], (instruc)data[MESSAGE]);
@@ -184,7 +205,7 @@ ret_t Node::readPacket(uint8_t* par) {
         udp.read(data, size);
         strcpy((char*)par, (char*)data);
         udp.flush();
-        if((node)_INT(data[TO]) == ip_id) 
+        if((node)(data[TO] - 48) == ip_id) 
             return KEEP;
         else if((monkey == root ? 0 : 1) + banana.size() - 1 > 0) 
             return FOWARD;
