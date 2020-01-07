@@ -69,17 +69,7 @@ void read_task(void* pvParameters) {
                 Serial.println("Process message.");
                 if((data[MESSAGE] - 48) == HELLO) {
                     Serial.println("Replying...");
-                    n.createPacket(packet, (node)data[FROM], (node)(n.getID() + 48), (node)(n.getID() + 48), (instruc)(HELLO_BACK + 48));
-
-                    Serial.println("Created packet.");
-                    Serial.print("From ");
-                    Serial.println(n.getNames((node)(packet[FROM] - 48)));
-                    Serial.print("To ");
-                    Serial.println(n.getNames((node)(packet[TO] - 48)));
-                    Serial.print("Message:  ");
-                    Serial.println(n.getInstruction((instruc)(packet[MESSAGE]- 48)));
-                    Serial.print("Tarzan:  ");
-                    Serial.println(n.getNames((node)(packet[TARZAN]- 48)));
+                    n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(HELLO_BACK));
 
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
