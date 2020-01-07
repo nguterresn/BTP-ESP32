@@ -145,10 +145,10 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
 
         Serial.print("Sending packet ");
         
-
         if(this->checkTree((node)data[TO])){
             Serial.print("directly to ");
-            Serial.println(getNames((node)(packet[TO])));
+            Serial.println(getNames((node)(data[TO])));
+
             IPAddress ip(172, 20, 10, data[TO]);
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
@@ -168,23 +168,22 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
                 udp.beginPacket(ip, PORT);
                 udp.write(packet, 5);
                 udp.endPacket();
-            }
-            
+            }  
         }
         printPacket(packet);
     }
   }
 
-  void Node::printPacket(uint8_t* data) {
+  void Node::printPacket(uint8_t* d) {
     Serial.println("****************************************");
     Serial.print("From ");
-    Serial.println(getNames((node)(data[FROM] - 48)));
+    Serial.println(getNames((node)(d[FROM] - 48)));
     Serial.print("To ");
-    Serial.println(getNames((node)(data[TO] - 48)));
+    Serial.println(getNames((node)(d[TO] - 48)));
     Serial.print("Message:  ");
-    Serial.println(getInstruction((instruc)(data[MESSAGE] - 48)));
+    Serial.println(getInstruction((instruc)(d[MESSAGE] - 48)));
     Serial.print("Tarzan:  ");
-    Serial.println(getNames((node)(data[TARZAN] - 48)));
+    Serial.println(getNames((node)(d[TARZAN] - 48)));
     Serial.println("****************************************");
   }
 
@@ -202,7 +201,7 @@ ret_t Node::readPacket(uint8_t* par) {
     size = udp.parsePacket();
 
     if(size > 0) {
-        udp.read(data, size);
+        udp.read(data, 5);
         strcpy((char*)par, (char*)data);
         udp.flush();
         if((node)(data[TO] - 48) == ip_id) 

@@ -40,7 +40,7 @@ void send_task(void* pvParameters) {
     data[TO] = ((char*)pvParameters) [TO];
     data[MESSAGE] = ((char*)pvParameters) [MESSAGE];
     data[TARZAN] = ((char*)pvParameters) [TARZAN];
-    
+
     n.sendPacket((uint8_t*)data);
     vTaskDelete(NULL);
 }
@@ -56,14 +56,7 @@ void read_task(void* pvParameters) {
         ret = n.readPacket(data);
         if(ret != EMPTY) {
             Serial.println("Received packet.");
-            Serial.print("From ");
-            Serial.println(n.getNames((node)(data[FROM] - 48)));
-            Serial.print("To ");
-            Serial.println(n.getNames((node)(data[TO] - 48)));
-            Serial.print("Message:  ");
-            Serial.println(n.getInstruction((instruc)(data[MESSAGE] - 48)));
-            Serial.print("Tarzan:  ");
-            Serial.println(n.getNames((node)(data[TARZAN] - 48)));
+            n.printPacket(data);
 
             if(ret == KEEP) {
                 Serial.println("Process message.");
