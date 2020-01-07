@@ -138,14 +138,14 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
         uint8_t* data = DATA_S.back();
         DATA_S.pop_back();
 
-        packet[FROM] = data[FROM] + 48;
-        packet[MESSAGE] = data[MESSAGE] + 48;
-        packet[TO] = data[TO] + 48;
-        packet[TARZAN] = ip_id + 48;
+        packet[FROM] = _CHAR(data[FROM]);
+        packet[MESSAGE] = _CHAR(data[MESSAGE]);
+        packet[TO] = _CHAR(data[TO]);
+        packet[TARZAN] = _CHAR(ip_id);
 
         if(this->checkTree((node)data[TO])){
             IPAddress ip(172, 20, 10, data[TO]);
-            Serial.println("Staring to send...");
+            Serial.println("Starting to send...");
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
             udp.endPacket();
@@ -181,12 +181,12 @@ ret_t Node::readPacket(uint8_t* par) {
     size = udp.parsePacket();
 
     if(size > 0) {
-        udp.read(data, 5);
+        udp.read(data, size);
         strcpy((char*)par, (char*)data);
         udp.flush();
-        if((node)(data[TO] - 48) == ip_id) 
+        if((node)_INT(data[TO]) == ip_id) 
             return KEEP;
-        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0) 
+        else if((monkey == root ? 0 : 1) + banana.size() - 1 > 0) 
             return FOWARD;
         else
             return IGNORE;

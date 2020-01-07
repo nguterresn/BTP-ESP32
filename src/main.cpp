@@ -57,30 +57,20 @@ void read_task(void* pvParameters) {
         if(ret != EMPTY) {
             Serial.println("Received packet.");
             Serial.print("From ");
-            Serial.println(n.getNames((node)(data[FROM] - 48)));
+            Serial.println(n.getNames((node)_INT(data[FROM])));
             Serial.print("To ");
-            Serial.println(n.getNames((node)(data[TO] - 48)));
+            Serial.println(n.getNames((node)_INT(data[TO])));
             Serial.print("Message:  ");
-            Serial.println(n.getInstruction((instruc)(data[MESSAGE]- 48)));
+            Serial.println(n.getInstruction((instruc)_INT(data[MESSAGE])));
             Serial.print("Tarzan:  ");
-            Serial.println(n.getNames((node)(data[TARZAN]- 48)));
+            Serial.println(n.getNames((node)_INT(data[TARZAN])));
 
             if(ret == KEEP) {
                 Serial.println("Process message.");
-                if((data[MESSAGE] - 48) == HELLO) {
+                if(_INT(data[MESSAGE]) == HELLO) {
                     Serial.println("Replying...");
-                    n.createPacket(packet, (node)data[FROM], (node)(n.getID() + 48), (node)(n.getID() + 48), (instruc)(HELLO_BACK + 48));
-
-                    Serial.println("Created packet.");
-                    Serial.print("From ");
-                    Serial.println(n.getNames((node)(packet[FROM] - 48)));
-                    Serial.print("To ");
-                    Serial.println(n.getNames((node)(packet[TO] - 48)));
-                    Serial.print("Message:  ");
-                    Serial.println(n.getInstruction((instruc)(packet[MESSAGE]- 48)));
-                    Serial.print("Tarzan:  ");
-                    Serial.println(n.getNames((node)(packet[TARZAN]- 48)));
-
+                    memset(packet, 0, 5);
+                    n.createPacket(packet, (node)_INT(data[FROM]), (node)n.getID(), (node)n.getID(), HELLO_BACK);
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
             } else if(ret == FOWARD) {
