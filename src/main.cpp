@@ -84,7 +84,7 @@ void read_task(void* pvParameters) {
         vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
 }
-
+//hello
 void check_serial(void* pvParameters) {
     TickType_t xLastWakeTime;
     TickType_t freq_ticks = 100;  // Periodic task of 100ms
