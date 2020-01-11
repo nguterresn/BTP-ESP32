@@ -15,7 +15,7 @@ std::map<node, String> node_names = {
 
 std::map<node, std::vector<node>> tree_init{
     {node_a, {root, node_b, node_c}},
-    {node_b, {node_a}},
+    {node_b, {node_a, node_d}},
     {node_c, {node_a}},
     {node_d, {node_b}}};
 
@@ -227,7 +227,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
                 
                 IPAddress ip(172, 20, 10, this->getMonkey());
                 udp.beginPacket(ip, PORT);
-                Serial.println(udp.write(packet, 5));
+                udp.write(packet, 5);
                 udp.endPacket();
             }
         }
