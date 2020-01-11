@@ -58,6 +58,7 @@ void read_task(void* pvParameters) {
     while(1){
         ret = n.readPacket(data);
         if(ret != EMPTY) {
+            Serial.println("*************************************************");
             Serial.println("Received packet.");
             Serial.print("From ");
             Serial.println(n.getNames((node)(data[FROM] - 48)));
@@ -67,6 +68,7 @@ void read_task(void* pvParameters) {
             Serial.println(n.getInstruction((instruc)(data[MESSAGE]- 48)));
             Serial.print("Tarzan:  ");
             Serial.println(n.getNames((node)(data[TARZAN]- 48)));
+           
 
             if(ret == KEEP) {
                 /* Process all received reliable data */
@@ -113,11 +115,13 @@ void read_task(void* pvParameters) {
                  data[FROM] = data[FROM] - 48;
                  data[MESSAGE] = data[MESSAGE] - 48;
                  data[TO] = data[TO] - 48;
+                 data[TARZAN] = data[TARZAN] - 48;
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)data, configMAX_PRIORITIES - 1, NULL);
             } else if(ret == IGNORE) {
                 Serial.println("Ignore message");
             }
-     
+         Serial.println("*************************************************");
+         Serial.println("");
         }
         vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }

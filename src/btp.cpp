@@ -184,7 +184,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
         packet[MESSAGE] = data[MESSAGE] + 48;
         packet[TO] = data[TO] + 48;
         packet[TARZAN] = ip_id + 48;
-
+        Serial.println("****************************************");
         Serial.println("Created packet.");
         Serial.print("From ");
         Serial.println(getNames((node)(packet[FROM] - 48)));
@@ -194,8 +194,8 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
         Serial.println(getInstruction((instruc)(packet[MESSAGE] - 48)));
         Serial.print("Tarzan:  ");
         Serial.println(getNames((node)(packet[TARZAN] - 48)));
+        Serial.println("");
 
-        
         
         
         if (this->checkTree((node)data[TO]))
@@ -214,7 +214,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
             {
                 if (this->getBananas().at(i) != data[TARZAN])
                 {
-
+                    
                     IPAddress ip(172, 20, 10, getBananas().at(i));
                     udp.beginPacket(ip, PORT);
                     udp.write(packet, 5);
