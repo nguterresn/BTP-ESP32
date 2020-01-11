@@ -175,7 +175,7 @@ void control_task(void *pvParameters) {
 
         } else if(!strncmp(cmd, "reconf ",7)) {
              if(cmd[7]-96 >= 1 && cmd[7]-96<=3 && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
-                if(n.getBananas().size() != 0){
+                if(n.getBananas().size() == 0){
 
                 int8_t r = n.calcTree();
 
