@@ -20,7 +20,12 @@ std::map<instruc, String> instructions{
     {LED, "Change LED state"},
     {HELLO, "Hello"},
     {HELLO_BACK, "Hello to you too!"},
-    {RECONF, "Reconfigure tree"}};
+    {REQUEST, "Request"},
+    {REQUEST_OK, "Request_OK"},
+    {NOT_YOUR_SON, "I'm not your son anymore!"},
+    {YOUR_SON, "I'm your son now"}
+
+    };
 
 bool Node::connectWifi()
 {

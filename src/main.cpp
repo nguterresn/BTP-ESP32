@@ -78,11 +78,8 @@ void read_task(void* pvParameters) {
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
                 if((data[MESSAGE] - 48) == LED) {
-                    Serial.println("Replying...");
-                    //n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(HELLO_BACK));
                     digitalWrite(LED_PIN, led_tog);
-                    led_tog ^= led_tog; 
-                    //xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                    led_tog = !led_tog; 
                 }
             } else if(ret == FOWARD) {
                 Serial.println("Foward message");
