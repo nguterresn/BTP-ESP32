@@ -4,6 +4,7 @@
 #include <freertos/StackMacros.h>
 #include <btp.h>
 
+
 #define BAUD 9600
 
 Node n;
@@ -12,6 +13,8 @@ instruc instruction;
 node destination;
 
 TaskHandle_t t;
+
+uint8_t led_tog = 1;
 
 void get_info() {
     Serial.println("+--------------------------------------+");
@@ -66,12 +69,20 @@ void read_task(void* pvParameters) {
             Serial.println(n.getNames((node)(data[TARZAN]- 48)));
 
             if(ret == KEEP) {
+                /* Process all received reliable data */
                 Serial.println("Process message.");
                 if((data[MESSAGE] - 48) == HELLO) {
                     Serial.println("Replying...");
                     n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(HELLO_BACK));
 
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                }
+                if((data[MESSAGE] - 48) == LED) {
+                    Serial.println("Replying...");
+                    //n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(HELLO_BACK));
+                    digitalWrite(LED_PIN, led_tog);
+                    led_tog ^= led_tog; 
+                    //xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
             } else if(ret == FOWARD) {
                 Serial.println("Foward message");
@@ -88,7 +99,7 @@ void read_task(void* pvParameters) {
         vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
 }
-//hello
+
 void check_serial(void* pvParameters) {
     TickType_t xLastWakeTime;
     TickType_t freq_ticks = 100;  // Periodic task of 100ms
@@ -133,7 +144,8 @@ void control_task(void *pvParameters) {
         Serial.println();
         memset(packet, 0, 5);
 
-        if(!strncmp(cmd, "hello ", 6)) {
+        if(!strncmp(cmd, "HELLO ", 6)) {
+            /* between node 1 and 3 */
             if(cmd[6]-96 >= 1 && cmd[6]-96<=3) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
@@ -142,8 +154,20 @@ void control_task(void *pvParameters) {
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
             } else 
                 Serial.println("Node is not in the network!");
-        } else if(!strcmp(cmd, "info")) {
+        } else if(!strcmp(cmd, "INFO")) {
             get_info();
+        } else if(!strcmp(cmd, "RECONF")) {
+            boolean reconf_state = 1;
+        } else if (!strncmp(cmd, "LED ",4)) {
+            /* between node 1 and 3 */
+            if(cmd[4]-96 >= 1 && cmd[4]-96<=3) {
+                packet[FROM] = n.getID();
+                packet[TO] = cmd[4] - 96; 
+                packet[MESSAGE] = LED; // test led.builtin on
+                packet[TARZAN] = n.getID();
+                xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+            } else 
+                Serial.println("Node is not in the network!");
         }
     }
 }
@@ -170,6 +194,8 @@ void setup() {
         Serial.println("=> Tree well set.");
     else
         Serial.println("=> Tree not well set.\n\n");
+
+    pinMode(LED,OUTPUT);
 
     n.startUDP();
     

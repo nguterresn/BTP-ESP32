@@ -21,6 +21,8 @@
 #define TO      2
 #define TARZAN  3
 
+#define LED_PIN 2
+
 typedef enum node {root, node_a, node_b, node_c, no_node} node;
 
 typedef enum instruc {LED, HELLO, HELLO_BACK, RECONF} instruc;
