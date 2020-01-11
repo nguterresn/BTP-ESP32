@@ -78,11 +78,8 @@ void read_task(void* pvParameters) {
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
                 if((data[MESSAGE] - 48) == LED) {
-                    Serial.println("Replying...");
-                    //n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(HELLO_BACK));
-                    digitalWrite(2, led_tog);
+                    digitalWrite(LED_PIN, led_tog);
                     led_tog = !led_tog; 
-                    //xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
             } else if(ret == FOWARD) {
                 Serial.println("Foward message");
@@ -145,8 +142,7 @@ void control_task(void *pvParameters) {
         memset(packet, 0, 5);
 
         if(!strncmp(cmd, "hello ", 6)) {
-            /* between node 1 and 3 */
-            if(cmd[6]-96 >= 1 && cmd[6]-96<=3 && (cmd[6]-96) != n.getID()) {
+            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= 3 && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
                 packet[MESSAGE] = HELLO;
@@ -179,7 +175,7 @@ void control_task(void *pvParameters) {
             
         } else if (!strncmp(cmd, "led ",4)) {
             /* between node 1 and 3 */
-            if(cmd[4]-96 >= 1 && cmd[4]-96<=3) {
+            if(cmd[4]-96 >= 1 && cmd[4]-96 <= 3 && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[4] - 96; 
                 packet[MESSAGE] = LED; // test led.builtin on
@@ -214,7 +210,7 @@ void setup() {
     else
         Serial.println("=> Tree not well set.\n\n");
 
-    pinMode(2,OUTPUT);
+    pinMode(LED_PIN,OUTPUT);
 
     n.startUDP();
     
