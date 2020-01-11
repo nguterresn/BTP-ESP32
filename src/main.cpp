@@ -145,7 +145,7 @@ void control_task(void *pvParameters) {
         memset(packet, 0, 5);
 
         if(!strncmp(cmd, "hello ", 6)) {
-            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= 3 &&(cmd[6]-96) != n.getID()) {
+            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= 3 && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
                 packet[MESSAGE] = HELLO;
@@ -154,12 +154,14 @@ void control_task(void *pvParameters) {
             } else 
                 Serial.println("Node is not in the network!");
         } else if(!strcmp(cmd, "info")) {
+
+            Serial.print(cmd);
             get_info();
         } else if(!strcmp(cmd, "reconf")) {
             boolean reconf_state = 1;
         } else if (!strncmp(cmd, "led ", 4)) {
             /* between node 1 and 3 */
-            if(cmd[4]-96 >= 1 && cmd[4]-96<=3) {
+            if(cmd[4]-96 >= 1 && cmd[4]-96 <= 3 && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[4] - 96; 
                 packet[MESSAGE] = LED; // test led.builtin on
