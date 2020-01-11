@@ -134,7 +134,7 @@ void control_task(void *pvParameters) {
         memset(packet, 0, 5);
 
         if(!strncmp(cmd, "hello ", 6)) {
-            if(cmd[6]-96 >= 1 && cmd[6]-96<=3) {
+            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= 3 &&(cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
                 packet[MESSAGE] = HELLO;
@@ -144,7 +144,9 @@ void control_task(void *pvParameters) {
                 Serial.println("Node is not in the network!");
         } else if(!strcmp(cmd, "info")) {
             get_info();
-        }
+        } else if(!strncmp(cmd, "reconf ", 7)){
+            
+        } 
     }
 }
 
