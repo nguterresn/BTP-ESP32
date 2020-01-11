@@ -180,26 +180,26 @@ void control_task(void *pvParameters) {
             get_info();
 
         } else if(!strncmp(cmd, "reconf ",7)) {
-             if(cmd[7]-96 >= 1 && cmd[7]-96<=N_NODES && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
+             if(cmd[7]-96 >= 1 && cmd[7]-96 <= N_NODES && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
                 if(n.getBananas().size() == 0){
 
-                int8_t r = n.calcTree();
+                    int8_t r = n.calcTree();
 
-                if(r == -1){
-                    Serial.println("Arvore com custo mínimo");
-                }else if(r == cmd[7]-96){
+                    if(r == -1){
+                        Serial.println("Arvore com custo mínimo");
+                    }else {
 
-                packet[FROM] = n.getID();
-                packet[TO] = cmd[7] - 96; // because nodes start at 1
-                packet[MESSAGE] = REQUEST;
-                packet[TARZAN] = n.getID();
-                xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                        packet[FROM] = n.getID();
+                        packet[TO] = r; 
+                        packet[MESSAGE] = REQUEST;
+                        packet[TARZAN] = n.getID();
+                        xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
 
-                }
+                    }
 
-            }else{
+                }else{
                 Serial.println("Não tem permisão");
-            }
+                }
              }else {
                  Serial.println("Node not valid");
              }
