@@ -23,8 +23,9 @@ std::map<instruc, String> instructions{
     {REQUEST, "Request"},
     {REQUEST_OK, "Request_OK"},
     {NOT_YOUR_SON, "I'm not your son anymore!"},
-    {YOUR_SON, "I'm your son now"}
-
+    {YOUR_SON, "I'm your son now"},
+    {NOT_YOUR_SON_OK,"OKEY"},
+    {YOUR_SON_OK,"OKEY,SON"}
     };
 
 bool Node::connectWifi()
@@ -134,6 +135,7 @@ String Node::getInstruction(instruc i)
 
 void Node::createPacket(uint8_t *packet, node to, node from, node tarzan, instruc instruction)
 {
+    memset(packet,0,5);
     packet[FROM] = from;
     packet[TO] = to;
     packet[MESSAGE] = instruction;

@@ -81,24 +81,28 @@ void read_task(void* pvParameters) {
                     digitalWrite(LED_PIN, led_tog);
                     led_tog = !led_tog; 
                 }else if((data[MESSAGE] - 48) == REQUEST){
-                    n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(BROADCAST));
-                    xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                   // n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(BROADCAST));
+                    //xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                     n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(REQUEST_OK));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
 
                 }else if((data[MESSAGE] - 48) == REQUEST_OK){
                     n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(NOT_YOUR_SON));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+
+                }
+                else if((data[MESSAGE] - 48) == NOT_YOUR_SON){
+                    n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(NOT_YOUR_SON_OK));
+                    xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                    n.deleteBanana((node)(data[FROM] - 48));
+                }else if(data[MESSAGE] - 48 == NOT_YOUR_SON_OK){
                     n.setMonkey((node)(data[FROM] - 48));
                     n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(YOUR_SON));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
-
-                }else if((data[MESSAGE] - 48) == NOT_YOUR_SON){
-                    n.deleteBanana((node)(data[FROM] - 48));
                 }
                 else if((data[MESSAGE] - 48) == YOUR_SON)
                 {
-                    n.newBanana((node)(data[FROM] - 48));
+                n.newBanana((node)(data[FROM] - 48));
                 }
                 
             } else if(ret == FOWARD) {
@@ -182,7 +186,7 @@ void control_task(void *pvParameters) {
                 if(r == -1){
                     Serial.println("Arvore com custo mínimo");
                 }else if(r == cmd[7]-96){
-                    
+
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[7] - 96; // because nodes start at 1
                 packet[MESSAGE] = REQUEST;
