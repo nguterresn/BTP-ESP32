@@ -32,6 +32,7 @@ class Node {
         WiFiUDP getUDP();
         ret_t readPacket(uint8_t* par);
         void scanNetworks();
+        int8_t calcTree();
 };
 
 
