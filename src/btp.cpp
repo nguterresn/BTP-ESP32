@@ -105,12 +105,15 @@ std::vector<node> Node::getBananas()
 
 void Node::deleteBanana(node oldBanana){
 
+
 for(int i = 0;i < banana.size();i++){
+
+Serial.println("Current bananas ----" + getNames(oldBanana));
+
     if(this->getBananas().at(i) == oldBanana){
-        this->banana.erase(banana.begin()+i);
-       
+    this->banana.erase(banana.begin()+i);  
     }
-     Serial.println("Current bananas " + this->getBananas().at(i));
+     
 }
 
 }
@@ -201,7 +204,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
             udp.endPacket();
 
             if (data[MESSAGE] == NOT_YOUR_SON_OK)
-                deleteBanana((node)(data[TO] - 48));
+                deleteBanana((node)(data[TO]));
         }
         else
         {
@@ -250,7 +253,7 @@ ret_t Node::readPacket(uint8_t *par)
         udp.flush();
         if ((node)(data[TO] - 48) == ip_id)
             return KEEP;
-        else if ((tree_init.find((node)ip_id)->second).size() - 1 > 0)
+        else if (banana.size()> 0)
             return FOWARD;
         else
             return IGNORE;

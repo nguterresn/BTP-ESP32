@@ -118,7 +118,7 @@ void read_task(void* pvParameters) {
             } else if(ret == IGNORE) {
                 Serial.println("Ignore message");
             }
-            Serial.println("Enter command: ");
+     
         }
         vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
