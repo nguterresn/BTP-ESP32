@@ -11,7 +11,7 @@ Node n;
 
 instruc instruction;
 node destination;
-
+node targetMonkey = n.getMonkey();
 TaskHandle_t t;
 
 uint8_t led_tog = 1;
@@ -89,7 +89,7 @@ void read_task(void* pvParameters) {
                 }else if((data[MESSAGE] - 48) == REQUEST_OK){
                     n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(NOT_YOUR_SON));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
-
+                    targetMonkey = (node)(data[FROM] - 48);
                 }
                 else if((data[MESSAGE] - 48) == NOT_YOUR_SON){
 
@@ -99,7 +99,7 @@ void read_task(void* pvParameters) {
 
                 } else if(data[MESSAGE] - 48 == NOT_YOUR_SON_OK) {
 
-                    n.setMonkey((node)(data[FROM] - 48));
+                    n.setMonkey(targetMonkey);
                     n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(YOUR_SON));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
