@@ -162,6 +162,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
         } else {
             for(int i = 0; i < this->getBananas().size(); i++){
                 if(this->getBananas().at(i) != data[TARZAN]) {
+                    
                     IPAddress ip(172, 20, 10, getBananas().at(i));
                     udp.beginPacket(ip, PORT);
                     udp.write(packet, 5);
@@ -169,9 +170,10 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction) {
                 }
             }
             if(this->getMonkey() != root && this->getMonkey() != data[TARZAN]) {
+                Serial.println(".................");
                 IPAddress ip(172, 20, 10, this->getMonkey());
                 udp.beginPacket(ip, PORT);
-                udp.write(packet, 5);
+                Serial.println(udp.write(packet, 5));
                 udp.endPacket();
             }
         }
@@ -196,9 +198,8 @@ ret_t Node::readPacket(uint8_t* par) {
         udp.flush();
         if((node)(data[TO] - 48) == ip_id) 
             return KEEP;
-        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0){
+        else if((tree_init.find((node)ip_id)->second).size() - 1 > 0) 
             return FOWARD;
-        }   
         else
             return IGNORE;
     }
