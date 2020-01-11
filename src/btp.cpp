@@ -104,9 +104,17 @@ std::vector<node> Node::getBananas()
 
 void Node::deleteBanana(node oldBanana){
 
+for(int i = 0;i < banana.size();i++){
+    if(this->getBananas().at(i) == oldBanana){
+        this->banana.erase(banana.begin()+i);
+       
+    }
+     Serial.println("Current bananas " + this->getBananas().at(i));
+}
+
 }
 void Node::newBanana(node newBanana){
-
+    this->banana.push_back(newBanana);
 }
 
 String Node::getNames(node n)
