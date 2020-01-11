@@ -113,7 +113,6 @@ void read_task(void* pvParameters) {
                  data[FROM] = data[FROM] - 48;
                  data[MESSAGE] = data[MESSAGE] - 48;
                  data[TO] = data[TO] - 48;
-                 data[TARZAN] = (node)(n.getID());
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)data, configMAX_PRIORITIES - 1, NULL);
             } else if(ret == IGNORE) {
                 Serial.println("Ignore message");
@@ -208,7 +207,7 @@ void control_task(void *pvParameters) {
             
         } else if (!strncmp(cmd, "led ",4)) {
             /* between node 1 and 3 */
-            if(cmd[4]-96 >= 1 && cmd[4]-96 <= N_NODES && (cmd[6]-96) != n.getID()) {
+            if(cmd[4]-96 >= 1 && cmd[4]-96 <= N_NODES && (cmd[4]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[4] - 96; 
                 packet[MESSAGE] = LED; // test led.builtin on
