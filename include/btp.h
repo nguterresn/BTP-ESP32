@@ -20,10 +20,13 @@ class Node {
         int8_t getID();
         void startUDP();
         node getMonkey();
+        void setMonkey(node newMonkey);
         bool checkTree(char c);
         void createPacket(uint8_t* packet, node to, node from, node tarzan, instruc instruction);
         bool checkTree(node c);
         std::vector <node> getBananas();
+        void deleteBanana(node oldBanana);
+        void newBanana(node newBanana);
         String getNames(node n);
         String getInstruction(instruc i);
         String getSSID();

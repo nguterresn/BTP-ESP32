@@ -77,10 +77,30 @@ void read_task(void* pvParameters) {
 
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
-                if((data[MESSAGE] - 48) == LED) {
+                else if((data[MESSAGE] - 48) == LED) {
                     digitalWrite(LED_PIN, led_tog);
                     led_tog = !led_tog; 
+                }else if((data[MESSAGE] - 48) == REQUEST){
+                    n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(BROADCAST));
+                    xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                    n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(REQUEST_OK));
+                    xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+
+                }else if((data[MESSAGE] - 48) == REQUEST_OK){
+                    n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(NOT_YOUR_SON));
+                    xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+                    n.setMonkey((node)(data[FROM] - 48));
+                    n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(YOUR_SON));
+                    xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
+
+                }else if((data[MESSAGE] - 48) == NOT_YOUR_SON){
+                    n.deleteBanana((node)(data[FROM] - 48));
                 }
+                else if((data[MESSAGE] - 48) == YOUR_SON)
+                {
+                    n.newBanana((node)(data[FROM] - 48));
+                }
+                
             } else if(ret == FOWARD) {
                 Serial.println("Foward message");
                  data[FROM] = data[FROM] - 48;
@@ -155,13 +175,19 @@ void control_task(void *pvParameters) {
 
         } else if(!strncmp(cmd, "reconf ",7)) {
              if(cmd[7]-96 >= 1 && cmd[7]-96<=3 && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
-                if(n.getBananas().size != 0){
+                if(n.getBananas().size() != 0){
 
                 int8_t r = n.calcTree();
 
                 if(r == -1){
                     Serial.println("Arvore com custo mínimo");
-                }else{
+                }else if(r == cmd[7]-96){
+                    
+                packet[FROM] = n.getID();
+                packet[TO] = cmd[7] - 96; // because nodes start at 1
+                packet[MESSAGE] = REQUEST;
+                packet[TARZAN] = n.getID();
+                xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
 
                 }
 

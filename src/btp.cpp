@@ -91,9 +91,22 @@ node Node::getMonkey()
     return monkey;
 }
 
+void Node::setMonkey(node newMonkey)
+{
+    monkey = newMonkey;
+}
+
+
 std::vector<node> Node::getBananas()
 {
     return banana;
+}
+
+void Node::deleteBanana(node oldBanana){
+
+}
+void Node::newBanana(node newBanana){
+
 }
 
 String Node::getNames(node n)
@@ -167,6 +180,9 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
         Serial.print("Tarzan:  ");
         Serial.println(getNames((node)(packet[TARZAN] - 48)));
 
+        
+        
+        
         if (this->checkTree((node)data[TO]))
         {
             IPAddress ip(172, 20, 10, data[TO]);
