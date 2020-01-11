@@ -196,7 +196,7 @@ void setup() {
     else
         Serial.println("=> Tree not well set.\n\n");
 
-    pinMode(LED,OUTPUT);
+    pinMode(LED_PIN,OUTPUT);
 
     n.startUDP();
     
