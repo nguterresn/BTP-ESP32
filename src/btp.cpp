@@ -3,18 +3,21 @@
 std::map<std::string, node> mac_t{
     {"A4:CF:12:54:DD:D4", node_a},
     {"3C:71:BF:EA:B6:A8", node_b},
-    {"30:AE:A4:15:1C:0C", node_c}};
+    {"30:AE:A4:15:1C:0C", node_c},
+    {"A4:CF:12:9F:06:08",node_d}};
 
 std::map<node, String> node_names = {
     {root, "root"},
     {node_a, "node A"},
     {node_b, "node B"},
-    {node_c, "node C"}};
+    {node_c, "node C"},
+    {node_d, "node D"}};
 
 std::map<node, std::vector<node>> tree_init{
     {node_a, {root, node_b, node_c}},
     {node_b, {node_a}},
-    {node_c, {node_a}}};
+    {node_c, {node_a}},
+    {node_d, {node_b}}};
 
 std::map<instruc, String> instructions{
     {LED, "Change LED state"},

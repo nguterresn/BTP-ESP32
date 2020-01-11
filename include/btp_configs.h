@@ -10,7 +10,7 @@
 #define PASS "sdis_password"
 
 #define ROOT 0
-#define N_NODES 3
+#define N_NODES 4
 #define MAC_WIDTH 30
 #define PORT 6535
 
@@ -23,7 +23,7 @@
 
 #define LED_PIN 2
 
-typedef enum node {root, node_a, node_b, node_c, no_node} node;
+typedef enum node {root, node_a, node_b, node_c,node_d, no_node} node;
 
 typedef enum instruc {LED, HELLO, HELLO_BACK, REQUEST,REQUEST_OK, NOT_YOUR_SON, YOUR_SON, NOT_YOUR_SON_OK, YOUR_SON_OK} instruc;
 

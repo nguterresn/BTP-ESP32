@@ -169,7 +169,7 @@ void control_task(void *pvParameters) {
         memset(packet, 0, 5);
 
         if(!strncmp(cmd, "hello ", 6)) {
-            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= 3 && (cmd[6]-96) != n.getID()) {
+            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= N_NODES && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
                 packet[MESSAGE] = HELLO;
@@ -181,7 +181,7 @@ void control_task(void *pvParameters) {
             get_info();
 
         } else if(!strncmp(cmd, "reconf ",7)) {
-             if(cmd[7]-96 >= 1 && cmd[7]-96<=3 && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
+             if(cmd[7]-96 >= 1 && cmd[7]-96<=N_NODES && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
                 if(n.getBananas().size() == 0){
 
                 int8_t r = n.calcTree();
@@ -208,7 +208,7 @@ void control_task(void *pvParameters) {
             
         } else if (!strncmp(cmd, "led ",4)) {
             /* between node 1 and 3 */
-            if(cmd[4]-96 >= 1 && cmd[4]-96 <= 3 && (cmd[6]-96) != n.getID()) {
+            if(cmd[4]-96 >= 1 && cmd[4]-96 <= N_NODES && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[4] - 96; 
                 packet[MESSAGE] = LED; // test led.builtin on
