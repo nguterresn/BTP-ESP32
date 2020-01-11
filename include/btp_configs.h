@@ -25,6 +25,6 @@
 
 typedef enum node {root, node_a, node_b, node_c, no_node} node;
 
-typedef enum instruc {LED, HELLO, HELLO_BACK, RECONF} instruc;
+typedef enum instruc {LED, HELLO, HELLO_BACK, REQUEST,REQUEST_OK, NOT_YOUR_SON,YOUR_SON} instruc;
 
 typedef enum ret_t {KEEP, FOWARD, IGNORE, ERROR, EMPTY} ret_t;

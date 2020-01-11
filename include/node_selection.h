@@ -33,7 +33,7 @@ boolean dataToExec = 0;
 WiFiUDP udp;
 list<String> DATA_S;
 list<String> DATA_T;
-
+boolean reconf_state = 1;
 
 /* isto é confuso */
 typedef uint8_t node;

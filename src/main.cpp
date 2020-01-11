@@ -80,8 +80,8 @@ void read_task(void* pvParameters) {
                 if((data[MESSAGE] - 48) == LED) {
                     Serial.println("Replying...");
                     //n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(HELLO_BACK));
-                    digitalWrite(LED_PIN, led_tog);
-                    led_tog ^= led_tog; 
+                    digitalWrite(2, led_tog);
+                    led_tog = !led_tog; 
                     //xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
             } else if(ret == FOWARD) {
@@ -144,14 +144,9 @@ void control_task(void *pvParameters) {
         Serial.println();
         memset(packet, 0, 5);
 
-<<<<<<< HEAD
-        if(!strncmp(cmd, "HELLO ", 6)) {
-            /* between node 1 and 3 */
-            if(cmd[6]-96 >= 1 && cmd[6]-96<=3) {
-=======
         if(!strncmp(cmd, "hello ", 6)) {
-            if((cmd[6]-96) >= 1 && (cmd[6]-96) <= 3 &&(cmd[6]-96) != n.getID()) {
->>>>>>> 8a16f98abe546b43d3450318e9e0eb85c369b96e
+            /* between node 1 and 3 */
+            if(cmd[6]-96 >= 1 && cmd[6]-96<=3 && (cmd[6]-96) != n.getID()) {
                 packet[FROM] = n.getID();
                 packet[TO] = cmd[6] - 96; // because nodes start at 1
                 packet[MESSAGE] = HELLO;
@@ -159,12 +154,30 @@ void control_task(void *pvParameters) {
                 xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
             } else 
                 Serial.println("Node is not in the network!");
-        } else if(!strcmp(cmd, "INFO")) {
+        } else if(!strcmp(cmd, "info")) {
             get_info();
-<<<<<<< HEAD
-        } else if(!strcmp(cmd, "RECONF")) {
-            boolean reconf_state = 1;
-        } else if (!strncmp(cmd, "LED ",4)) {
+
+        } else if(!strncmp(cmd, "reconf ",7)) {
+             if(cmd[7]-96 >= 1 && cmd[7]-96<=3 && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
+                if(n.getBananas().size != 0){
+
+                int8_t r = n.calcTree();
+
+                if(r == -1){
+                    Serial.println("Arvore com custo mínimo");
+                }else{
+
+                }
+
+            }else{
+                Serial.println("Não tem permisão");
+            }
+             }else {
+                 Serial.println("Node not valid");
+             }
+            
+            
+        } else if (!strncmp(cmd, "led ",4)) {
             /* between node 1 and 3 */
             if(cmd[4]-96 >= 1 && cmd[4]-96<=3) {
                 packet[FROM] = n.getID();
@@ -175,11 +188,6 @@ void control_task(void *pvParameters) {
             } else 
                 Serial.println("Node is not in the network!");
         }
-=======
-        } else if(!strncmp(cmd, "reconf ", 7)){
-            
-        } 
->>>>>>> 8a16f98abe546b43d3450318e9e0eb85c369b96e
     }
 }
 
@@ -206,7 +214,7 @@ void setup() {
     else
         Serial.println("=> Tree not well set.\n\n");
 
-    pinMode(LED,OUTPUT);
+    pinMode(2,OUTPUT);
 
     n.startUDP();
     

@@ -165,7 +165,6 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
         if (this->checkTree((node)data[TO]))
         {
             IPAddress ip(172, 20, 10, data[TO]);
-            Serial.println("Starting to send...");
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
             udp.endPacket();
@@ -185,7 +184,7 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
             }
             if (this->getMonkey() != root && this->getMonkey() != data[TARZAN])
             {
-                Serial.println(".................");
+                
                 IPAddress ip(172, 20, 10, this->getMonkey());
                 udp.beginPacket(ip, PORT);
                 Serial.println(udp.write(packet, 5));
