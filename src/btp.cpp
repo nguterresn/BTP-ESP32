@@ -199,6 +199,9 @@ void Node::sendPacket(node from, node to, node tarzan, instruc instruction)
             udp.beginPacket(ip, PORT);
             udp.write(packet, 5);
             udp.endPacket();
+
+            if (data[MESSAGE] == NOT_YOUR_SON_OK)
+                deleteBanana((node)(data[TO] - 48));
         }
         else
         {

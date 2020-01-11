@@ -92,17 +92,20 @@ void read_task(void* pvParameters) {
 
                 }
                 else if((data[MESSAGE] - 48) == NOT_YOUR_SON){
+
                     n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(NOT_YOUR_SON_OK));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
-                    n.deleteBanana((node)(data[FROM] - 48));
-                }else if(data[MESSAGE] - 48 == NOT_YOUR_SON_OK){
+                    //n.deleteBanana((node)(data[FROM] - 48));
+
+                } else if(data[MESSAGE] - 48 == NOT_YOUR_SON_OK) {
+
                     n.setMonkey((node)(data[FROM] - 48));
                     n.createPacket(packet, n.getMonkey(), (node)(n.getID()), (node)(n.getID()), (instruc)(YOUR_SON));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                 }
                 else if((data[MESSAGE] - 48) == YOUR_SON)
                 {
-                n.newBanana((node)(data[FROM] - 48));
+                    n.newBanana((node)(data[FROM] - 48));
                 }
                 
             } else if(ret == FOWARD) {
