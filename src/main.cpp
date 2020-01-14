@@ -57,7 +57,6 @@ void read_task(void* pvParameters) {
     xLastWakeTime = xTaskGetTickCount();
     uint8_t data[5];
     uint8_t packet[5];
-
     while(1){
         ret = n.readPacket(data);
         if(ret != EMPTY) {
@@ -134,10 +133,12 @@ void check_serial(void* pvParameters) {
     xLastWakeTime = xTaskGetTickCount();
 
     while(1) {
+        
         if(Serial.available() > 0) {
             vTaskResume(t);
             vTaskDelete(NULL);
         }
+        
         vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
 }
@@ -153,13 +154,13 @@ void control_task(void *pvParameters) {
     while(1) {
         xTaskCreate(check_serial, "Check Serial Port", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
         vTaskSuspend(NULL);
-
+        
         i = 0;
         memset(cmd, 0, 10);
 
         while(Serial.available()) {
             c = Serial.read();
-            if(c != 13) {
+            if(c != '.') {
                 cmd[i++] = c;
                 Serial.print(c);
                 xTaskCreate(check_serial, "Check Serial Port", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
@@ -183,7 +184,7 @@ void control_task(void *pvParameters) {
         } else if(!strcmp(cmd, "info")) {
             get_info();
 
-        } else if(!strncmp(cmd, "reconf ",7)) {
+        } else if(!strncmp(cmd, "reconf ", 7)) {
              if(cmd[7] - 96 >= 1 && cmd[7] - 96 <= N_NODES && 
                (cmd[7] - 96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
                 if(n.getBananas().size() == 0){
