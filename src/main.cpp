@@ -29,7 +29,9 @@ void get_info() {
     Serial.println("+--------------------------------------+");
     Serial.print("|   Bananas: ");
     for(int i = 0; i < n.getBananas().size(); i++) {
-        Serial.print(n.getNames(n.getBananas()[i]) + ", ");
+        Serial.print(n.getNames(n.getBananas()[i]));
+        if(i < n.getBananas().size() - 1)
+            Serial.println(", ");
     }
     Serial.println("\n+--------------------------------------+");
     Serial.print("|   IP address: ");
@@ -55,6 +57,7 @@ void read_task(void* pvParameters) {
     xLastWakeTime = xTaskGetTickCount();
     uint8_t data[5];
     uint8_t packet[5];
+
     while(1){
         ret = n.readPacket(data);
         if(ret != EMPTY) {
@@ -83,8 +86,6 @@ void read_task(void* pvParameters) {
                     digitalWrite(LED_PIN, led_tog);
                     led_tog = !led_tog; 
                 }else if((data[MESSAGE] - 48) == REQUEST){
-                   // n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(BROADCAST));
-                    //xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
                     n.createPacket(packet, (node)(data[FROM] - 48), (node)(n.getID()), (node)(n.getID()), (instruc)(REQUEST_OK));
                     xTaskCreate(send_task, "Send UDP packets", 10000, (void*)packet, configMAX_PRIORITIES - 1, NULL);
 
@@ -120,8 +121,8 @@ void read_task(void* pvParameters) {
             } else if(ret == IGNORE) {
                 Serial.println("Ignore message");
             }
-         Serial.println("*************************************************");
-         Serial.println("");
+         Serial.println("*************************************************\n");
+
         }
         vTaskDelayUntil(&xLastWakeTime, freq_ticks);
     }
@@ -150,7 +151,6 @@ void control_task(void *pvParameters) {
     memset(packet, 0, 5);
 
     while(1) {
-        Serial.println("Enter command: ");
         xTaskCreate(check_serial, "Check Serial Port", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
         vTaskSuspend(NULL);
 
@@ -159,7 +159,7 @@ void control_task(void *pvParameters) {
 
         while(Serial.available()) {
             c = Serial.read();
-            if(c != '.') {
+            if(c != 13) {
                 cmd[i++] = c;
                 Serial.print(c);
                 xTaskCreate(check_serial, "Check Serial Port", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
