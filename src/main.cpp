@@ -184,14 +184,15 @@ void control_task(void *pvParameters) {
             get_info();
 
         } else if(!strncmp(cmd, "reconf ",7)) {
-             if(cmd[7]-96 >= 1 && cmd[7]-96 <= N_NODES && (cmd[7]-96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
+             if(cmd[7] - 96 >= 1 && cmd[7] - 96 <= N_NODES && 
+               (cmd[7] - 96) != n.getID() && (cmd[7]-96) != n.getMonkey() ){
                 if(n.getBananas().size() == 0){
 
                     int8_t r = n.calcTree();
 
                     if(r == -1){
-                        Serial.println("Arvore com custo mínimo");
-                    }else {
+                        Serial.println("Tree with minimal cost");
+                    } else {
 
                         packet[FROM] = n.getID();
                         packet[TO] = r; 
@@ -202,10 +203,10 @@ void control_task(void *pvParameters) {
                     }
 
                 }else{
-                Serial.println("Não tem permisão");
+                Serial.println("You have no permission.");
                 }
              }else {
-                 Serial.println("Node not valid");
+                 Serial.println("Node not valid.");
              }
             
             
