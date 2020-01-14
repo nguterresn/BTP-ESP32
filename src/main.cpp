@@ -53,7 +53,7 @@ void send_task(void* pvParameters) {
 void read_task(void* pvParameters) {
     ret_t ret;
     TickType_t xLastWakeTime;
-    TickType_t freq_ticks = 50;  // Periodic task of 50ms
+    TickType_t freq_ticks = 7;  // Periodic task of 50ms
     xLastWakeTime = xTaskGetTickCount();
     uint8_t data[5];
     uint8_t packet[5];
@@ -129,7 +129,7 @@ void read_task(void* pvParameters) {
 
 void check_serial(void* pvParameters) {
     TickType_t xLastWakeTime;
-    TickType_t freq_ticks = 100;  // Periodic task of 100ms
+    TickType_t freq_ticks = 20;  // Periodic task of 100ms
     xLastWakeTime = xTaskGetTickCount();
 
     while(1) {
